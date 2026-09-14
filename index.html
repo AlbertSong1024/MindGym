@@ -271,16 +271,33 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .footer .ft-donate{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
 .footer .ft-donate-title{font-weight:600;color:var(--text);margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .footer .ft-donate-title .coffee{font-size:1.05rem}
-.footer .ft-qrs{display:flex;gap:14px;flex-wrap:wrap}
+.footer .ft-qrs{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
 .footer .ft-qr{text-align:center}
-.footer .ft-qr img{width:92px;height:92px;border-radius:10px;border:1px solid var(--line);background:#fff}
+.footer .ft-qr img{width:92px;height:92px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer;transition:transform .18s,box-shadow .18s}
+.footer .ft-qr img:hover{transform:scale(1.08);box-shadow:0 4px 14px rgba(0,0,0,.12)}
 .footer .ft-qr span{display:block;margin-top:4px;font-size:.72rem;color:var(--text-light)}
 @media (min-width:561px){
   .footer .ft-qr img{width:108px;height:108px}
 }
+
+/* ==================== Lightbox 弹窗 ==================== */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:9999;display:none;align-items:center;justify-content:center;animation:fadeIn .18s}
+.lightbox.show{display:flex}
+.lightbox img{max-width:92vw;max-height:88vh;border-radius:14px;box-shadow:0 8px 40px rgba(0,0,0,.4);cursor:default;animation:lbZoom .22s}
+@keyframes lbZoom{from{transform:scale(.85);opacity:0}to{transform:none;opacity:1}}
+.lightbox .lb-tip{position:absolute;bottom:18px;left:0;right:0;text-align:center;color:#ccc;font-size:.78rem;letter-spacing:.5px}
+.lightbox .lb-close{position:absolute;top:16px;right:18px;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;font-size:1.3rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s}
+.lightbox .lb-close:hover{background:rgba(255,255,255,.32)}
 </style>
 </head>
 <body>
+
+<!-- ==================== Lightbox ==================== -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+  <div class="lb-close" onclick="closeLightbox()">✕</div>
+  <img id="lb-img" src="" alt="">
+  <div class="lb-tip">右键图片另存为 · 按 Esc 或点击空白关闭</div>
+</div>
 
 <!-- ==================== 首页 ==================== -->
 <div class="view active" id="view-home">
@@ -931,6 +948,7 @@ document.querySelectorAll('#back-seg button').forEach(function (b) {
 
 /* ---------- PC 键盘操作 ---------- */
 document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') { closeLightbox(); return; }
   if (!session || !document.getElementById('view-quiz').classList.contains('active')) return;
   var q = curQ();
   var rec = session.picked[q.id];
@@ -946,6 +964,21 @@ document.addEventListener('keydown', function (e) {
   var map = { a: 'A', b: 'B', c: 'C', d: 'D', '1': 'A', '2': 'B', '3': 'C', '4': 'D' };
   var L = map[e.key.toLowerCase()];
   if (L && q.type !== '判断') { pickOption(L); }
+});
+
+/* ---------- Lightbox 弹窗 ---------- */
+function openLightbox(src) {
+  var lb = document.getElementById('lightbox');
+  document.getElementById('lb-img').src = src;
+  lb.classList.add('show');
+}
+function closeLightbox(e) {
+  if (e && e.target && e.target.tagName === 'IMG') return; // 点图片本身不关
+  document.getElementById('lightbox').classList.remove('show');
+}
+document.addEventListener('click', function (e) {
+  var img = e.target.closest('.ft-qr img');
+  if (img) { openLightbox(img.getAttribute('src')); }
 });
 
 /* ---------- 启动 ---------- */

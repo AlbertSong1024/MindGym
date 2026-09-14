@@ -247,14 +247,6 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
   .judge-btn{padding:16px 8px}
   .sheet-grid{grid-template-columns:repeat(auto-fill,minmax(34px,1fr))}
   .kbd-tip{display:none!important}
-  /* 移动端底部固定操作条，避开 iOS 安全区 */
-  .quiz-actions{
-    position:fixed;left:0;right:0;bottom:0;z-index:60;
-    background:rgba(255,255,255,.95);backdrop-filter:blur(10px);
-    padding:10px 12px calc(10px + var(--safe-b));margin:0;
-    border-top:1px solid var(--line);
-  }
-  body.quiz-mode{padding-bottom:86px}
 }
 /* PC 端键盘提示 */
 @media (min-width:561px){ .kbd-tip{display:block} }
@@ -487,7 +479,6 @@ function show(id) {
 }
 function goHome() {
   session = null;
-  document.body.classList.remove('quiz-mode');
   renderHome();
   show('view-home');
 }
@@ -554,7 +545,6 @@ function newSession(key, title, list, sMode) {
     picked: {},          // 本会话内已作答的选择 {qid: {sel:[...], ok:bool}}
     sheetOpen: true
   };
-  document.body.classList.add('quiz-mode');
   document.getElementById('quiz-title').textContent = title;
   show('view-quiz');
   renderQuestion();

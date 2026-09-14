@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#3b6df0">
+<title>两学题库 · 刷题</title>
+<!-- 题库数据：由 questions.js 提供 window.QUESTIONS 数组 -->
+<script src="questions.js"></script>
+<style>
+/* ==================== 基础变量与重置 ==================== */
+:root{
+  --primary:#3b6df0; --primary-dark:#2f57c9; --primary-light:#e8eeff;
+  --green:#0e9f6e; --green-bg:#e6f7f0;
+  --red:#e02424;  --red-bg:#fdeaea;
+  --amber:#d97706; --amber-bg:#fef3e2;
+  --text:#1f2937; --text-sub:#6b7280; --text-light:#9ca3af;
+  --bg:#f4f6fb; --card:#ffffff; --line:#e5e8f0;
+  --radius:14px;
+  --shadow:0 1px 3px rgba(16,24,40,.06),0 4px 16px rgba(16,24,40,.05);
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{font-size:16px}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+  background:var(--bg); color:var(--text); line-height:1.65;
+  min-height:100vh; min-height:100dvh;
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+::selection{background:var(--primary-light)}
+
+/* ==================== 通用布局 ==================== */
+.container{max-width:820px;margin:0 auto;padding:0 16px 40px}
+.view{display:none}
+.view.active{display:block;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ==================== 顶部栏 ==================== */
+.topbar{
+  position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+}
+.topbar-inner{max-width:820px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px}
+.topbar .back{display:flex;align-items:center;gap:4px;color:var(--text-sub);font-size:.95rem;padding:6px 8px;margin-left:-8px;border-radius:8px}
+.topbar .back:hover{background:var(--primary-light);color:var(--primary)}
+.topbar .title{font-weight:600;font-size:1.02rem;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.icon-btn{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--text-sub);font-size:1.15rem;flex:none}
+.icon-btn:hover{background:var(--primary-light);color:var(--primary)}
+.icon-btn.on{color:var(--amber)}
+
+/* ==================== 首页 ==================== */
+.hero{padding:26px 0 6px}
+.hero h1{font-size:1.5rem;letter-spacing:.5px}
+.hero p{color:var(--text-sub);font-size:.92rem;margin-top:4px}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:18px 0 6px}
+.stat{background:var(--card);border-radius:var(--radius);padding:12px 6px;text-align:center;box-shadow:var(--shadow)}
+.stat b{font-size:1.25rem;display:block;font-variant-numeric:tabular-nums}
+.stat span{font-size:.75rem;color:var(--text-sub)}
+.stat.total b{color:var(--primary)} .stat.right b{color:var(--green)}
+.stat.wrong b{color:var(--red)}  .stat.fav b{color:var(--amber)}
+
+.mode-row{display:flex;align-items:center;gap:8px;margin:16px 0 6px;color:var(--text-sub);font-size:.88rem;flex-wrap:wrap}
+.mode-label{color:var(--text-sub);font-size:.85rem}
+.mode-divider{width:1px;height:18px;background:var(--line);margin:0 4px}
+.seg{display:inline-flex;background:#e9edf5;border-radius:999px;padding:3px}
+.seg button{padding:5px 16px;border-radius:999px;font-size:.85rem;color:var(--text-sub)}
+.seg button.on{background:var(--card);color:var(--primary);font-weight:600;box-shadow:0 1px 4px rgba(16,24,40,.12)}
+
+.sec-title{font-size:.9rem;color:var(--text-sub);margin:22px 0 10px;font-weight:600}
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cat-card{
+  background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);
+  text-align:left;display:flex;flex-direction:column;gap:8px;transition:transform .15s,box-shadow .15s;
+}
+.cat-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(16,24,40,.10)}
+.cat-card .head{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.badge{font-size:.72rem;padding:2px 9px;border-radius:999px;font-weight:600;flex:none}
+.badge.s1{background:var(--primary-light);color:var(--primary)}
+.badge.s2{background:#f3e8ff;color:#7c3aed}
+.badge.t单选{background:var(--green-bg);color:var(--green)}
+.badge.t多选{background:var(--amber-bg);color:var(--amber)}
+.badge.t判断{background:#e0f2fe;color:#0284c7}
+.cat-card h3{font-size:.98rem}
+.cat-card .num{font-size:.8rem;color:var(--text-sub)}
+.cat-card .num b{color:var(--text);font-size:.9rem}
+.bar{height:6px;background:#edf0f7;border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--primary),#6d9bff);border-radius:99px;transition:width .4s}
+.cat-card .go{color:var(--primary);font-size:.86rem;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.quick{border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:4px;text-align:left;color:#fff}
+.quick.wrong{background:linear-gradient(135deg,#f2596b,#e02424)}
+.quick.fav{background:linear-gradient(135deg,#f59e0b,#d97706)}
+.quick.all{background:linear-gradient(135deg,#4f83f9,#2f57c9)}
+.quick b{font-size:1.02rem}
+.quick span{font-size:.78rem;opacity:.9}
+.quick:hover{filter:brightness(1.05);transform:translateY(-2px);transition:transform .15s,filter .15s}
+
+/* ==================== 刷题页 ==================== */
+.quiz-head{padding:18px 0 0}
+.quiz-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.qpos{font-size:.85rem;color:var(--text-sub);font-variant-numeric:tabular-nums}
+.qpos b{color:var(--text);font-size:1rem}
+.progressbar{height:6px;background:#e6eaf3;border-radius:99px;margin-top:12px;overflow:hidden}
+.progressbar i{display:block;height:100%;background:linear-gradient(90deg,var(--primary),#6d9bff);border-radius:99px;transition:width .3s}
+.prev-state{font-size:.75rem;color:var(--text-light);padding:6px 10px;background:#eef1f7;border-radius:99px;display:none}
+.prev-state.show{display:inline-block}
+.prev-state.was-wrong{color:var(--red);background:var(--red-bg)}
+.prev-state.was-right{color:var(--green);background:var(--green-bg)}
+
+.qcard{
+  background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:22px 20px;margin-top:16px;
+}
+.qtype-tag{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:600;margin-bottom:10px}
+.qtype-tag .dot{width:8px;height:8px;border-radius:50%}
+.qtype-tag.multiple{color:var(--amber)} .qtype-tag.multiple .dot{background:var(--amber)}
+.qtype-tag.single{color:var(--green)}  .qtype-tag.single .dot{background:var(--green)}
+.qtype-tag.judge{color:#0284c7}       .qtype-tag.judge .dot{background:#0284c7}
+.qtext{font-size:1.06rem;font-weight:600;line-height:1.7;word-break:break-word}
+
+.options{margin-top:16px;display:flex;flex-direction:column;gap:10px}
+.opt{
+  display:flex;align-items:flex-start;gap:12px;padding:13px 14px;border:1.5px solid var(--line);
+  border-radius:12px;background:#fafbfd;text-align:left;font-size:.98rem;line-height:1.55;
+  transition:border-color .15s,background .15s;min-height:50px;
+}
+.opt .letter{
+  flex:none;width:26px;height:26px;border-radius:50%;border:1.5px solid #cdd4e0;color:var(--text-sub);
+  display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:600;margin-top:1px;
+}
+.opt:hover:not(:disabled){border-color:var(--primary);background:#f5f8ff}
+.opt.selected{border-color:var(--primary);background:var(--primary-light)}
+.opt.selected .letter{border-color:var(--primary);background:var(--primary);color:#fff}
+.opt.correct{border-color:var(--green);background:var(--green-bg)}
+.opt.correct .letter{border-color:var(--green);background:var(--green);color:#fff}
+.opt.wrong{border-color:var(--red);background:var(--red-bg)}
+.opt.wrong .letter{border-color:var(--red);background:var(--red);color:#fff}
+.opt:disabled{cursor:default;opacity:1}
+
+.judge-btns{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+.judge-btn{
+  padding:16px;border-radius:12px;border:1.5px solid var(--line);background:#fafbfd;
+  font-size:1.05rem;font-weight:600;min-height:58px;
+}
+.judge-btn:hover:not(:disabled){border-color:var(--primary);background:#f5f8ff}
+.judge-btn.correct{border-color:var(--green);background:var(--green-bg);color:var(--green)}
+.judge-btn.wrong{border-color:var(--red);background:var(--red-bg);color:var(--red)}
+
+.feedback{margin-top:16px;border-radius:12px;padding:13px 15px;font-size:.92rem;display:none;animation:fadeIn .2s}
+.feedback.show{display:block}
+.feedback.ok{background:var(--green-bg);color:var(--green)}
+.feedback.no{background:var(--red-bg);color:var(--red)}
+.feedback b{font-size:.95rem}
+.feedback .ans-line{margin-top:2px}
+.expl{margin-top:10px;background:#eef4ff;border-radius:10px;padding:12px 14px;color:#33415c;font-size:.9rem;display:none}
+.expl.show{display:block}
+.expl .expl-title{font-weight:700;color:var(--primary);margin-bottom:4px}
+
+/* 背题模式答案卡片 */
+.back-ans{
+  margin-top:16px;border-radius:12px;padding:14px 16px;
+  background:linear-gradient(135deg,#e6f7f0,#eaf5ff);
+  border:1.5px solid #bfe6d4;animation:fadeIn .2s;
+}
+.back-ans .ba-title{font-weight:700;color:var(--green);display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:.98rem}
+.back-ans .ba-title .ans-val{
+  background:var(--green);color:#fff;padding:2px 14px;border-radius:999px;
+  font-size:1.1rem;letter-spacing:2px;font-weight:700;font-variant-numeric:tabular-nums;
+}
+.back-ans .ba-exp{margin-top:10px;padding-top:10px;border-top:1px dashed #b8e0cf;color:#33415c;font-size:.9rem}
+.back-ans .ba-exp .ba-exp-title{font-weight:700;color:var(--green);font-size:.82rem;margin-bottom:2px}
+/* 背题选项：只展示、无悬停"可点"错觉 */
+.opt.reveal{cursor:default}
+.opt.reveal:hover:not(:disabled){border-color:var(--line);background:#fafbfd}
+.opt.reveal.correct{border-color:var(--green)}
+
+/* 底部操作 */
+.quiz-actions{display:flex;gap:12px;margin-top:16px;align-items:center}
+.btn{
+  flex:1;padding:13px 18px;border-radius:12px;font-size:1rem;font-weight:600;
+  display:flex;align-items:center;justify-content:center;gap:6px;min-height:50px;
+  transition:filter .15s,transform .05s;
+}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--primary);color:#fff}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn.primary:disabled{background:#b9c6e4;cursor:not-allowed}
+.btn.ghost{background:var(--card);border:1.5px solid var(--line);color:var(--text-sub)}
+.btn.ghost:hover{border-color:var(--primary);color:var(--primary)}
+.btn.danger{background:var(--red-bg);border:1.5px solid var(--red);color:var(--red)}
+.btn.danger:hover{background:#fbdcdc}
+.btn.confirm{background:var(--amber);color:#fff}
+.btn.confirm:hover{filter:brightness(1.05)}
+.btn.confirm:disabled{background:#e5cf9e;cursor:not-allowed}
+.kbd-tip{display:none;color:var(--text-light);font-size:.78rem;text-align:center;margin-top:12px}
+
+/* 答题卡 */
+.sheet{margin-top:16px;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;font-size:.9rem;color:var(--text-sub);margin-bottom:10px}
+.sheet-head button{color:var(--primary);font-size:.85rem;font-weight:600;padding:4px 8px;border-radius:6px}
+.sheet-head button:hover{background:var(--primary-light)}
+.sheet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:7px}
+.sheet-grid button{
+  aspect-ratio:1;border-radius:9px;background:#eef1f7;color:var(--text-sub);font-size:.82rem;font-weight:600;
+  border:1.5px solid transparent;
+}
+.sheet-grid button.cur{border-color:var(--primary);color:var(--primary);background:#fff}
+.sheet-grid button.right{background:var(--green-bg);color:var(--green)}
+.sheet-grid button.wrong{background:var(--red-bg);color:var(--red)}
+.legend{display:flex;gap:14px;margin-top:12px;font-size:.75rem;color:var(--text-light);flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+
+/* ==================== 列表页（错题本/收藏） ==================== */
+.list-summary{padding:20px 0 4px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.list-summary h2{font-size:1.25rem}
+.list-summary span{color:var(--text-sub);font-size:.88rem}
+.list-card{
+  background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:15px 16px;margin-top:10px;display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;
+}
+.list-card:hover{box-shadow:0 4px 16px rgba(16,24,40,.1)}
+.list-card .q-id{flex:none;font-size:.75rem;color:var(--text-light);font-variant-numeric:tabular-nums;padding-top:3px;min-width:34px}
+.list-card .q-mini{flex:1;min-width:0}
+.list-card .q-mini .t{font-size:.93rem;font-weight:600;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.list-card .q-mini .m{font-size:.76rem;color:var(--text-sub);margin-top:4px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.list-card .del{flex:none;color:var(--text-light);width:32px;height:32px;border-radius:8px;font-size:1rem}
+.list-card .del:hover{background:var(--red-bg);color:var(--red)}
+.list-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.list-actions .btn{min-height:46px;font-size:.92rem}
+.empty{text-align:center;color:var(--text-light);padding:60px 0;font-size:.95rem}
+.empty .big{font-size:2.6rem;margin-bottom:10px}
+
+/* ==================== 移动端适配（<=560px） ==================== */
+@media (max-width:560px){
+  html{font-size:15px}
+  .container{padding:0 12px 32px}
+  .hero h1{font-size:1.3rem}
+  .stats-row{grid-template-columns:repeat(4,1fr);gap:6px}
+  .stat{padding:10px 2px;border-radius:11px}
+  .stat b{font-size:1.05rem}
+  .stat span{font-size:.68rem}
+  .cat-grid,.quick-grid{grid-template-columns:1fr}
+  .qcard{padding:18px 15px;border-radius:12px}
+  .qtext{font-size:1.02rem}
+  .opt{padding:12px 12px;font-size:.95rem}
+  .judge-btn{padding:16px 8px}
+  .sheet-grid{grid-template-columns:repeat(auto-fill,minmax(34px,1fr))}
+  .kbd-tip{display:none!important}
+  /* 移动端底部固定操作条，避开 iOS 安全区 */
+  .quiz-actions{
+    position:fixed;left:0;right:0;bottom:0;z-index:60;
+    background:rgba(255,255,255,.95);backdrop-filter:blur(10px);
+    padding:10px 12px calc(10px + var(--safe-b));margin:0;
+    border-top:1px solid var(--line);
+  }
+  body.quiz-mode{padding-bottom:86px}
+}
+/* PC 端键盘提示 */
+@media (min-width:561px){ .kbd-tip{display:block} }
+</style>
+</head>
+<body>
+
+<!-- ==================== 首页 ==================== -->
+<div class="view active" id="view-home">
+  <div class="container">
+    <div class="hero">
+      <h1>两学题库刷题</h1>
+      <p>高等教育学 · 高等教育心理学 · 高校教师资格考试</p>
+    </div>
+
+    <div class="stats-row" id="stats-row">
+      <div class="stat total"><b>0</b><span>已刷题数</span></div>
+      <div class="stat right"><b>0%</b><span>正确率</span></div>
+      <div class="stat wrong"><b>0</b><span>错题</span></div>
+      <div class="stat fav"><b>0</b><span>收藏</span></div>
+    </div>
+
+    <div class="mode-row">
+      <span class="mode-label">刷题顺序</span>
+      <div class="seg" id="mode-seg">
+        <button data-mode="order" class="on">顺序</button>
+        <button data-mode="random">随机</button>
+      </div>
+      <span class="mode-divider"></span>
+      <span class="mode-label">学习方式</span>
+      <div class="seg" id="back-seg">
+        <button data-back="0" class="on">刷题</button>
+        <button data-back="1">背题</button>
+      </div>
+    </div>
+
+    <div class="sec-title">按分类刷题</div>
+    <div class="cat-grid" id="cat-grid"></div>
+
+    <div class="sec-title">快捷入口</div>
+    <div class="quick-grid">
+      <button class="quick wrong" onclick="startWrong()">
+        <b>错题本</b><span id="quick-wrong-n">0 道错题 · 消灭它</span>
+      </button>
+      <button class="quick fav" onclick="showFav()">
+        <b>我的收藏</b><span id="quick-fav-n">0 道收藏</span>
+      </button>
+      <button class="quick all" onclick="startAll()" style="grid-column:1/-1">
+        <b>全库随机 100 题</b><span>从 973 题中随机抽取模拟练习</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 刷题页 ==================== -->
+<div class="view" id="view-quiz">
+  <div class="topbar"><div class="topbar-inner">
+    <button class="back" onclick="goHome()">← 退出</button>
+    <div class="title" id="quiz-title">刷题</div>
+    <button class="icon-btn" id="fav-btn" title="收藏本题" onclick="toggleFav()">☆</button>
+  </div></div>
+  <div class="container">
+    <div class="quiz-head">
+      <div class="quiz-meta">
+        <span class="qpos"><b id="q-idx">1</b> / <span id="q-total">1</span></span>
+        <span class="prev-state" id="prev-state"></span>
+      </div>
+      <div class="progressbar"><i id="q-progress" style="width:0%"></i></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qtype-tag" id="q-type"></div>
+      <div class="qtext" id="q-text"></div>
+      <div class="options" id="q-options"></div>
+      <div class="judge-btns" id="q-judge" style="display:none">
+        <button class="judge-btn" onclick="answerJudge('对')">对</button>
+        <button class="judge-btn" onclick="answerJudge('错')">错</button>
+      </div>
+
+      <div class="feedback" id="feedback"></div>
+      <div class="back-ans" id="back-ans" style="display:none"></div>
+      <div class="expl" id="expl"><div class="expl-title">解析</div><div id="expl-body"></div></div>
+    </div>
+
+    <div class="quiz-actions">
+      <button class="btn ghost" id="btn-prev" onclick="move(-1)">上一题</button>
+      <button class="btn confirm" id="btn-confirm" onclick="confirmMulti()">确认</button>
+      <button class="btn primary" id="btn-next" onclick="move(1)">下一题</button>
+    </div>
+    <div class="kbd-tip">快捷键：A–D / 1–4 选择 · 回车 确认或下一题 · ← → 切换题目</div>
+
+    <div class="sheet">
+      <div class="sheet-head"><span>答题卡（本次练习）</span><button onclick="toggleSheet()">收起</button></div>
+      <div class="sheet-grid" id="sheet-grid"></div>
+      <div class="legend" id="sheet-legend">
+        <span><i style="background:#0e9f6e"></i>答对</span>
+        <span><i style="background:#e02424"></i>答错</span>
+        <span><i style="background:#fff;border:1px solid #3b6df0"></i>当前题</span>
+        <span><i style="background:#eef1f7"></i>未做</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 列表页（收藏） ==================== -->
+<div class="view" id="view-list">
+  <div class="topbar"><div class="topbar-inner">
+    <button class="back" onclick="goHome()">← 返回</button>
+    <div class="title" id="list-title">收藏夹</div>
+  </div></div>
+  <div class="container">
+    <div class="list-summary"><h2>我的收藏</h2><span id="list-count"></span></div>
+    <div class="list-actions">
+      <button class="btn primary" onclick="startFav()">刷收藏题</button>
+      <button class="btn danger" onclick="clearFav()">清空收藏</button>
+    </div>
+    <div id="fav-list"></div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+ * 两学题库刷题应用（纯前端，无依赖）
+ * 数据：window.QUESTIONS（questions.js）
+ * 持久化：localStorage（答题记录 / 收藏 / 进度 / 模式）
+ * ========================================================= */
+'use strict';
+
+var SUBJECTS = ['高等教育学', '高等教育心理学'];
+var TYPES = ['单选', '多选', '判断'];
+
+/* HTML 转义，防止题目文本中的特殊字符破坏页面 */
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/* ---------- 持久化工具 ---------- */
+var store = {
+  get: function (k, def) {
+    try { var v = localStorage.getItem(k); return v == null ? def : JSON.parse(v); }
+    catch (e) { return def; }
+  },
+  set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+var statusMap = store.get('mg_status', {});   // {题id: 1=对 2=错}
+var favSet    = store.get('mg_fav', []);      // 收藏的题 id 数组
+var posMap    = store.get('mg_pos', {});      // {分类key: 上次做到的下标}
+var mode      = store.get('mg_mode', 'order');// order | random
+var backMode  = store.get('mg_back', false);  // true=背题模式
+var session   = null;                          // 当前刷题会话
+
+function saveStatus(){ store.set('mg_status', statusMap); }
+function saveFav(){ store.set('mg_fav', favSet); }
+
+/* ---------- 数据检索 ---------- */
+var byId = {};
+QUESTIONS.forEach(function (q) { byId[q.id] = q; });
+
+function pick(subject, type) {
+  return QUESTIONS.filter(function (q) { return q.subject === subject && q.type === type; });
+}
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+/* ---------- 视图切换 ---------- */
+function show(id) {
+  document.querySelectorAll('.view').forEach(function (v) { v.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+function goHome() {
+  session = null;
+  document.body.classList.remove('quiz-mode');
+  renderHome();
+  show('view-home');
+}
+
+/* ---------- 首页渲染 ---------- */
+function catDone(list) {
+  return list.filter(function (q) { return statusMap[q.id]; }).length;
+}
+function renderHome() {
+  var done = 0, right = 0, wrong = 0;
+  QUESTIONS.forEach(function (q) {
+    var s = statusMap[q.id];
+    if (s) { done++; if (s === 1) right++; else wrong++; }
+  });
+  var acc = done ? Math.round(right / done * 100) + '%' : '—';
+  var stats = document.querySelectorAll('#stats-row .stat b');
+  stats[0].textContent = done; stats[1].textContent = acc;
+  stats[2].textContent = wrong; stats[3].textContent = favSet.length;
+  document.getElementById('quick-wrong-n').textContent = wrong + ' 道错题 · 消灭它';
+  document.getElementById('quick-fav-n').textContent = favSet.length + ' 道收藏';
+
+  /* 分类卡片 */
+  var grid = document.getElementById('cat-grid');
+  grid.innerHTML = '';
+  SUBJECTS.forEach(function (sub, si) {
+    TYPES.forEach(function (type) {
+      var list = pick(sub, type);
+      var doneN = catDone(list);
+      var pct = list.length ? Math.round(doneN / list.length * 100) : 0;
+      var card = document.createElement('button');
+      card.className = 'cat-card';
+      card.onclick = function () { startCat(sub, type); };
+      card.innerHTML =
+        '<div class="head">' +
+          '<span class="badge s' + (si + 1) + '">' + sub + '</span>' +
+          '<span class="badge t' + type + '">' + type + '</span>' +
+        '</div>' +
+        '<h3>' + sub + ' · ' + type + '题</h3>' +
+        '<div class="num">共 <b>' + list.length + '</b> 题 · 已刷 <b>' + doneN + '</b> 题</div>' +
+        '<div class="bar"><i style="width:' + pct + '%"></i></div>' +
+        '<div class="go"><span>' + (doneN ? '继续刷题' : '开始刷题') + '</span><span>' + pct + '% →</span></div>';
+      grid.appendChild(card);
+    });
+  });
+
+  /* 模式切换按钮状态 */
+  document.querySelectorAll('#mode-seg button').forEach(function (b) {
+    b.classList.toggle('on', b.dataset.mode === mode);
+  });
+  document.querySelectorAll('#back-seg button').forEach(function (b) {
+    b.classList.toggle('on', b.dataset.back === (backMode ? '1' : '0'));
+  });
+}
+
+/* ---------- 刷题会话 ---------- */
+function newSession(key, title, list, sMode) {
+  var isBack = (sMode === 'back');
+  var ordered = isBack ? true : (mode === 'order');  // 背题恒为顺序
+  var qs = ordered ? list.slice() : shuffle(list);
+  var startIdx = 0;
+  if (ordered && posMap[key] != null && posMap[key] < qs.length) startIdx = posMap[key];
+  session = {
+    key: key, title: title, list: qs, idx: startIdx, sMode: isBack,
+    picked: {},          // 本会话内已作答的选择 {qid: {sel:[...], ok:bool}}
+    sheetOpen: true
+  };
+  document.body.classList.add('quiz-mode');
+  document.getElementById('quiz-title').textContent = title;
+  show('view-quiz');
+  renderQuestion();
+}
+
+function startCat(sub, type) {
+  var key = sub + '/' + type;
+  if (backMode) {
+    newSession('back:' + key, '背题 · ' + sub + ' · ' + type, pick(sub, type), 'back');
+  } else {
+    newSession(key, sub + ' · ' + type, pick(sub, type), 'quiz');
+  }
+}
+function startWrong() {
+  var list = QUESTIONS.filter(function (q) { return statusMap[q.id] === 2; });
+  if (!list.length) { alert('太棒了，当前没有错题！'); return; }
+  newSession('wrong', '错题本（' + list.length + ' 题）', list);
+}
+function startFav() {
+  var list = favSet.map(function (id) { return byId[id]; }).filter(Boolean);
+  if (!list.length) { alert('收藏夹是空的，刷题时点右上角 ☆ 收藏题目吧'); return; }
+  newSession('fav', '收藏夹（' + list.length + ' 题）', list);
+}
+function startAll() {
+  newSession('all', '全库随机 100 题', shuffle(QUESTIONS).slice(0, 100));
+}
+
+/* ---------- 刷题页渲染 ---------- */
+function curQ() { return session.list[session.idx]; }
+
+function renderQuestion() {
+  var q = curQ();
+  var total = session.list.length;
+  document.getElementById('q-idx').textContent = session.idx + 1;
+  document.getElementById('q-total').textContent = total;
+  document.getElementById('q-progress').style.width =
+    Math.round((session.idx + 1) / total * 100) + '%';
+
+  /* 题型标签 */
+  var tag = document.getElementById('q-type');
+  var cls = q.type === '单选' ? 'single' : (q.type === '多选' ? 'multiple' : 'judge');
+  tag.className = 'qtype-tag ' + cls;
+  tag.innerHTML = '<span class="dot"></span>' +
+    (q.type === '多选' ? '多选题（可选多项）' : (q.type === '判断' ? '判断题' : '单选题'));
+
+  document.getElementById('q-text').textContent = q.question;
+
+  /* 收藏星标 */
+  var favBtn = document.getElementById('fav-btn');
+  var favIdx = favSet.indexOf(q.id);
+  favBtn.classList.toggle('on', favIdx >= 0);
+  favBtn.textContent = favIdx >= 0 ? '★' : '☆';
+
+  /* 上次作答记录提示 */
+  var prev = document.getElementById('prev-state');
+  var st = statusMap[q.id];
+  prev.className = 'prev-state' + (st ? (st === 1 ? ' show was-right' : ' show was-wrong') : '');
+  prev.textContent = st === 1 ? '上次答对' : (st === 2 ? '上次答错' : '');
+
+  if (session.sMode) {
+    renderBack(q);
+  } else {
+    renderOptions(q);
+    renderFeedback(q);
+    renderActions(q);
+  }
+  renderSheet();
+
+  /* 背题不判分，隐藏"答对/答错"图例 */
+  document.getElementById('sheet-legend').style.display =
+    session.sMode ? 'none' : 'flex';
+
+  document.getElementById('btn-prev').disabled = session.idx === 0;
+  document.getElementById('btn-next').textContent =
+    session.idx === total - 1 ? '完成' : '下一题';
+}
+
+/* 背题模式下渲染题目：只展示，不判分，正确答案标绿 */
+function renderBack(q) {
+  var box = document.getElementById('q-options');
+  var judge = document.getElementById('q-judge');
+  var fb = document.getElementById('feedback');
+  var expl = document.getElementById('expl');
+  var backAns = document.getElementById('back-ans');
+
+  /* 复位作答相关控件 */
+  fb.className = 'feedback';
+  expl.classList.remove('show');
+  document.getElementById('btn-confirm').style.display = 'none';
+  document.getElementById('btn-confirm').textContent = '确认';
+
+  var ansText = q.type === '判断' ? q.answer : q.answer.split('').join('、');
+
+  if (q.type === '判断') {
+    box.innerHTML = ''; box.style.display = 'none';
+    judge.style.display = 'none';
+  } else {
+    judge.style.display = 'none';
+    box.style.display = 'flex';
+    box.innerHTML = '';
+    var letters = ['A', 'B', 'C', 'D'];
+    letters.forEach(function (L) {
+      var text = q.options && q.options[L];
+      if (text == null) return;
+      var b = document.createElement('div');
+      b.className = 'opt reveal' + (q.answer.indexOf(L) >= 0 ? ' correct' : '');
+      b.innerHTML = '<span class="letter">' + L + '</span><span>' + esc(text) + '</span>';
+      box.appendChild(b);
+    });
+  }
+
+  /* 背题答案卡片 */
+  var html = '<div class="ba-title">正确答案：<span class="ans-val">' + ansText + '</span></div>';
+  if (q.explanation) {
+    html += '<div class="ba-exp"><div class="ba-exp-title">解析</div>' + esc(q.explanation) + '</div>';
+  }
+  backAns.innerHTML = html;
+  backAns.style.display = 'block';
+}
+
+function renderOptions(q) {
+  var box = document.getElementById('q-options');
+  var judge = document.getElementById('q-judge');
+  var rec = session.picked[q.id];
+
+  if (q.type === '判断') {
+    box.innerHTML = ''; box.style.display = 'none';
+    judge.style.display = 'grid';
+    judge.querySelectorAll('button').forEach(function (b) {
+      b.className = 'judge-btn'; b.disabled = !!rec;
+      var val = b.textContent;
+      if (rec) {
+        if (val === q.answer) b.classList.add('correct');
+        else if (val === rec.sel[0]) b.classList.add('wrong');
+      }
+    });
+    return;
+  }
+
+  judge.style.display = 'none'; box.style.display = 'flex';
+  box.innerHTML = '';
+  var letters = ['A', 'B', 'C', 'D'];
+  letters.forEach(function (L) {
+    var text = q.options && q.options[L];
+    if (text == null) return;
+    var btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.innerHTML = '<span class="letter">' + L + '</span><span>' + esc(text) + '</span>';
+    btn.onclick = function () { pickOption(L); };
+    box.appendChild(btn);
+  });
+  paintOptions(q, rec);
+}
+
+/* 选项着色（选中/对/错） */
+function paintOptions(q, rec) {
+  var box = document.getElementById('q-options');
+  var btns = box.querySelectorAll('.opt');
+  btns.forEach(function (b, i) {
+    var L = ['A', 'B', 'C', 'D'][i];
+    b.className = 'opt';
+    b.disabled = !!rec;
+    if (rec) {
+      var isAns = q.answer.indexOf(L) >= 0;
+      var isSel = rec.sel.indexOf(L) >= 0;
+      if (isAns) b.classList.add('correct');
+      else if (isSel) b.classList.add('wrong');
+    } else if (session.picked[q.id + '_tmp'] && session.picked[q.id + '_tmp'].indexOf(L) >= 0) {
+      b.classList.add('selected');
+    }
+  });
+}
+
+function renderFeedback(q) {
+  var fb = document.getElementById('feedback');
+  var expl = document.getElementById('expl');
+  var rec = session.picked[q.id];
+  if (!rec) { fb.className = 'feedback'; expl.classList.remove('show'); return; }
+
+  var ansText = q.type === '判断' ? q.answer : q.answer.split('').join('、');
+  fb.className = 'feedback show ' + (rec.ok ? 'ok' : 'no');
+  fb.innerHTML = rec.ok
+    ? '<b>回答正确</b>'
+    : '<b>回答错误</b><div class="ans-line">正确答案：' + ansText + '</div>';
+  if (q.explanation) {
+    document.getElementById('expl-body').textContent = q.explanation;
+    expl.classList.add('show');
+  } else {
+    expl.classList.remove('show');
+  }
+}
+
+function renderActions(q) {
+  var rec = session.picked[q.id];
+  var confirmBtn = document.getElementById('btn-confirm');
+  if (q.type === '多选') {
+    confirmBtn.style.display = 'flex';
+    confirmBtn.disabled = !!rec;
+    confirmBtn.textContent = rec ? '已作答' : '确认（选 ' + (tmpSel(q.id).length) + ' 项）';
+  } else {
+    confirmBtn.style.display = 'none';
+  }
+}
+
+/* ---------- 作答逻辑 ---------- */
+function tmpSel(qid) {
+  if (!session.picked[qid + '_tmp']) session.picked[qid + '_tmp'] = [];
+  return session.picked[qid + '_tmp'];
+}
+
+function pickOption(L) {
+  var q = curQ();
+  var rec = session.picked[q.id];
+  if (rec) return;                       // 已作答，锁定
+  if (q.type === '多选') {
+    var t = tmpSel(q.id);
+    var i = t.indexOf(L);
+    if (i >= 0) t.splice(i, 1); else t.push(L);
+    paintOptions(q, null);
+    renderActions(q);
+  } else {
+    settle(q, [L]);                      // 单选立即判分
+  }
+}
+
+function confirmMulti() {
+  var q = curQ();
+  if (session.picked[q.id]) return;
+  var t = tmpSel(q.id);
+  if (!t.length) { alert('请先选择至少一个选项'); return; }
+  settle(q, t);
+}
+
+function answerJudge(val) {
+  var q = curQ();
+  if (session.picked[q.id]) return;
+  settle(q, [val]);
+}
+
+/* 判分并记录 */
+function settle(q, sel) {
+  var ok;
+  if (q.type === '判断') {
+    ok = sel[0] === q.answer;
+  } else {
+    var a = q.answer.split('').sort().join('');
+    var b = sel.slice().sort().join('');
+    ok = a === b;
+  }
+  session.picked[q.id] = { sel: sel, ok: ok };
+
+  /* 持久化：以最新一次为准 */
+  statusMap[q.id] = ok ? 1 : 2;
+  saveStatus();
+  if (session.key === 'wrong' && ok) {
+    /* 错题本里答对 → 移出错题本 */
+    /* statusMap 已为 1，错题本自动不再收录 */
+  }
+  renderQuestion();
+}
+
+/* ---------- 收藏 ---------- */
+function toggleFav() {
+  var q = curQ();
+  var i = favSet.indexOf(q.id);
+  if (i >= 0) favSet.splice(i, 1); else favSet.push(q.id);
+  saveFav();
+  renderQuestion();
+}
+
+/* ---------- 移动 ---------- */
+function move(dir) {
+  if (!session) return;
+  var next = session.idx + dir;
+  if (dir > 0 && session.idx === session.list.length - 1) {
+    /* 完成：背题直接结束；刷题则统计作答 */
+    var total = session.list.length;      // 先取值，goHome 会清空 session
+    if (session.sMode) {
+      goHome();
+      alert('背题完成！共浏览 ' + total + ' 题。');
+      return;
+    }
+    var done = 0, right = 0;
+    session.list.forEach(function (q) {
+      var r = session.picked[q.id];
+      if (r) { done++; if (r.ok) right++; }
+    });
+    goHome();
+    alert('本次练习完成！\n已作答 ' + done + ' 题，答对 ' + right + ' 题' +
+      (done ? '，正确率 ' + Math.round(right / done * 100) + '%' : ''));
+    return;
+  }
+  if (next < 0) next = 0;
+  if (next > session.list.length - 1) next = session.list.length - 1;
+  session.idx = next;
+  /* 记录进度：背题恒顺序，其余仅顺序刷题模式记录 */
+  var shouldRecord = (session.sMode) ||
+    (session.key !== 'wrong' && session.key !== 'fav' && mode === 'order');
+  if (shouldRecord) {
+    posMap[session.key] = next; store.set('mg_pos', posMap);
+  }
+  renderQuestion();
+}
+
+/* ---------- 答题卡 ---------- */
+function renderSheet() {
+  var grid = document.getElementById('sheet-grid');
+  var headBtn = document.querySelector('.sheet-head button');
+  var sheet = document.querySelector('.sheet');
+  if (!session.sheetOpen) {
+    sheet.style.display = 'none';
+  } else {
+    sheet.style.display = 'block';
+    grid.innerHTML = '';
+    session.list.forEach(function (q, i) {
+      var b = document.createElement('button');
+      b.textContent = i + 1;
+      var rec = session.picked[q.id];
+      if (rec) b.classList.add(rec.ok ? 'right' : 'wrong');
+      if (i === session.idx) b.classList.add('cur');
+      b.onclick = function () { session.idx = i; renderQuestion(); };
+      grid.appendChild(b);
+    });
+    headBtn.textContent = '收起';
+  }
+}
+function toggleSheet() {
+  session.sheetOpen = !session.sheetOpen;
+  var headBtn = document.querySelector('.sheet-head button');
+  headBtn.textContent = session.sheetOpen ? '收起' : '展开';
+  document.querySelector('.sheet').style.display = session.sheetOpen ? 'block' : 'none';
+}
+
+/* ---------- 收藏夹列表 ---------- */
+function showFav() {
+  renderFavList();
+  show('view-list');
+}
+function renderFavList() {
+  var list = favSet.map(function (id) { return byId[id]; }).filter(Boolean);
+  document.getElementById('list-count').textContent = '共 ' + list.length + ' 题';
+  var box = document.getElementById('fav-list');
+  if (!list.length) {
+    box.innerHTML = '<div class="empty"><div class="big">☆</div>收藏夹是空的<br>刷题时点右上角 ☆ 即可收藏</div>';
+    return;
+  }
+  box.innerHTML = '';
+  list.forEach(function (q) {
+    var card = document.createElement('button');
+    card.className = 'list-card';
+    card.onclick = function () {
+      newSession('fav', '收藏夹（' + list.length + ' 题）', list);
+    };
+    card.innerHTML =
+      '<span class="q-id">#' + q.id + '</span>' +
+      '<span class="q-mini"><span class="t">' + esc(q.question) + '</span>' +
+      '<span class="m"><span class="badge s1" style="font-size:.68rem">' + q.subject + '</span>' +
+      '<span class="badge t' + q.type + '" style="font-size:.68rem">' + q.type + '</span>' +
+      '<span>答案：' + q.answer.split('').join('、') + '</span></span></span>' +
+      '<span class="del" title="取消收藏" onclick="event.stopPropagation();removeFav(' + q.id + ')">✕</span>';
+    box.appendChild(card);
+  });
+}
+function removeFav(id) {
+  var i = favSet.indexOf(id);
+  if (i >= 0) { favSet.splice(i, 1); saveFav(); }
+  renderFavList();
+}
+function clearFav() {
+  if (!favSet.length) return;
+  if (confirm('确定清空全部 ' + favSet.length + ' 道收藏吗？')) {
+    favSet = []; saveFav(); renderFavList();
+  }
+}
+
+/* ---------- 模式切换 ---------- */
+document.querySelectorAll('#mode-seg button').forEach(function (b) {
+  b.onclick = function () {
+    mode = b.dataset.mode;
+    store.set('mg_mode', mode);
+    renderHome();
+  };
+});
+document.querySelectorAll('#back-seg button').forEach(function (b) {
+  b.onclick = function () {
+    backMode = (b.dataset.back === '1');
+    store.set('mg_back', backMode);
+    renderHome();
+  };
+});
+
+/* ---------- PC 键盘操作 ---------- */
+document.addEventListener('keydown', function (e) {
+  if (!session || !document.getElementById('view-quiz').classList.contains('active')) return;
+  var q = curQ();
+  var rec = session.picked[q.id];
+  if (e.key === 'ArrowLeft')  { move(-1); return; }
+  if (e.key === 'ArrowRight') { move(1);  return; }
+  if (e.key === 'Enter') {
+    if (session.sMode) { move(1); return; }   // 背题：回车=下一题
+    if (q.type === '多选' && !rec) { confirmMulti(); }
+    else { move(1); }
+    return;
+  }
+  if (session.sMode) return;        // 背题模式：按键不触发作答
+  var map = { a: 'A', b: 'B', c: 'C', d: 'D', '1': 'A', '2': 'B', '3': 'C', '4': 'D' };
+  var L = map[e.key.toLowerCase()];
+  if (L && q.type !== '判断') { pickOption(L); }
+});
+
+/* ---------- 启动 ---------- */
+renderHome();
+</script>
+</body>
+</html>

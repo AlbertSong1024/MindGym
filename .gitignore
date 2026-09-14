@@ -1,0 +1,12 @@
+# 原始题目文档（不上传托管）
+两学题库-合成版.docx
+
+# 临时测试文件
+_check.js
+_bracket_check.py
+test_shots/
+
+# 系统垃圾
+.DS_Store
+Thumbs.db
+*.log

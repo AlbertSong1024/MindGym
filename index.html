@@ -258,6 +258,26 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 }
 /* PC 端键盘提示 */
 @media (min-width:561px){ .kbd-tip{display:block} }
+
+/* ==================== Footer ==================== */
+.footer{margin-top:28px;padding:20px 18px;border-radius:14px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);font-size:.82rem;color:var(--text-sub);line-height:1.9}
+.footer .ft-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed var(--line);font-weight:600;color:var(--text);font-size:.9rem}
+.footer .ft-head .ft-ver{background:var(--primary);color:#fff;font-size:.72rem;padding:1px 8px;border-radius:999px;font-weight:500}
+.footer .ft-row{display:flex;gap:6px;flex-wrap:wrap}
+.footer .ft-label{color:var(--text-light);min-width:54px}
+.footer a{color:var(--primary);text-decoration:none}
+.footer a:hover{text-decoration:underline}
+.footer .ft-warn{margin-top:10px;padding:8px 10px;background:#fff8e6;border-radius:8px;color:#8a6d00;font-size:.78rem;border-left:3px solid var(--amber)}
+.footer .ft-donate{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
+.footer .ft-donate-title{font-weight:600;color:var(--text);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.footer .ft-donate-title .coffee{font-size:1.05rem}
+.footer .ft-qrs{display:flex;gap:14px;flex-wrap:wrap}
+.footer .ft-qr{text-align:center}
+.footer .ft-qr img{width:92px;height:92px;border-radius:10px;border:1px solid var(--line);background:#fff}
+.footer .ft-qr span{display:block;margin-top:4px;font-size:.72rem;color:var(--text-light)}
+@media (min-width:561px){
+  .footer .ft-qr img{width:108px;height:108px}
+}
 </style>
 </head>
 <body>
@@ -305,6 +325,21 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
       <button class="quick all" onclick="startAll()" style="grid-column:1/-1">
         <b>全库随机 100 题</b><span>从 973 题中随机抽取模拟练习</span>
       </button>
+    </div>
+
+    <!-- ==================== Footer ==================== -->
+    <div class="footer">
+      <div class="ft-head">MindGym <span class="ft-ver">v1.0.0</span></div>
+      <div class="ft-row"><span class="ft-label">版权</span><span>© 2026 柠檬茶有力气 · All rights reserved.</span></div>
+      <div class="ft-row"><span class="ft-label">联系</span><a href="mailto:albert.song@foxmail.com">albert.song@foxmail.com</a></div>
+      <div class="ft-warn">📚 题库内容仅供学习参考，如有侵权请联系删除</div>
+      <div class="ft-donate">
+        <div class="ft-donate-title"><span class="coffee">☕</span>如果这个工具帮到了你，请我喝杯咖啡吧～</div>
+        <div class="ft-qrs">
+          <div class="ft-qr"><img src="wechat-pay.jpg" alt="微信支付"><span>微信</span></div>
+          <div class="ft-qr"><img src="alipay.jpg" alt="支付宝"><span>支付宝</span></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

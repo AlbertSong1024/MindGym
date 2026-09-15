@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#4f46e5">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%234f46e5'/%3E%3Ctext x='16' y='22' font-size='16' text-anchor='middle' fill='%23fff'%3E题%3C/text%3E%3C/svg%3E">
 <title>两学题库 · 刷题</title>
 <!-- 题库数据：由 questions.js 提供 window.QUESTIONS 数组 -->
 <script src="questions.js"></script>
@@ -1110,6 +1111,42 @@ document.addEventListener('keydown', function (e) {
   var L = map[e.key.toLowerCase()];
   if (L && q.type !== '判断') { pickOption(L); }
 });
+
+/* ---------- 移动端滑动切题 ---------- */
+(function () {
+  var THRESHOLD = 50;       /* 超过此水平位移（px）才触发翻页 */
+  var MAX_VERT  = 60;       /* 垂直位移超过此值则判定为滚动，不触发翻页 */
+  var EDGE_PAD  = 20;       /* 左右边缘保留区域，避免和 iOS 返回手势冲突 */
+  var swipe = { active: false, startX: 0, startY: 0, dx: 0, dy: 0, fired: false };
+
+  document.getElementById('view-quiz').addEventListener('touchstart', function (e) {
+    if (!session) return;
+    var t = e.touches[0];
+    swipe.active = true; swipe.fired = false;
+    swipe.startX = t.clientX; swipe.startY = t.clientY;
+    swipe.dx = 0; swipe.dy = 0;
+  }, { passive: true });
+
+  document.getElementById('view-quiz').addEventListener('touchmove', function (e) {
+    if (!swipe.active || swipe.fired) return;
+    var t = e.touches[0];
+    swipe.dx = t.clientX - swipe.startX;
+    swipe.dy = t.clientY - swipe.startY;
+  }, { passive: true });
+
+  document.getElementById('view-quiz').addEventListener('touchend', function (e) {
+    if (!swipe.active || swipe.fired) return;
+    swipe.active = false;
+    /* 边缘区域 → 跳过（让浏览器/系统处理） */
+    if (swipe.startX < EDGE_PAD || swipe.startX > window.innerWidth - EDGE_PAD) return;
+    /* 垂直位移主导 → 页面滚动，不拦截 */
+    if (Math.abs(swipe.dy) > Math.abs(swipe.dx)) return;
+    if (Math.abs(swipe.dx) < THRESHOLD) return;
+    swipe.fired = true;
+    if (swipe.dx < 0) move(1);   /* 向左滑 → 下一题 */
+    else              move(-1);  /* 向右滑 → 上一题 */
+  }, { passive: true });
+})();
 
 /* ---------- Lightbox ---------- */
 function openLightbox(src) {

@@ -1,7 +1,7 @@
-# MindGym v2.0.0 · 两学题库刷题应用
+# MindGym v2.1.0 · 两学题库刷题应用
 
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
-[![Version](https://img.shields.io/badge/version-v2.0.0-blue.svg)](https://github.com/AlbertSong1024/MindGym)
+[![Version](https://img.shields.io/badge/version-v2.1.0-blue.svg)](https://github.com/AlbertSong1024/MindGym)
 [![Stars](https://img.shields.io/badge/stars-⭐-yellow.svg)](https://github.com/AlbertSong1024/MindGym)
 
 纯前端、零依赖的刷题 + 背题应用，题库直接来自超星考试详情页提取。覆盖 **高等教育学** 与 **高等教育心理学** 两科共 **972 道题**（单选 / 多选 / 判断三种题型，100% 含答案解析和知识点标签），适配 PC 端和移动端，双击即可使用，无需服务器、无需联网。
@@ -239,9 +239,48 @@ A：直接点击二维码放大后右键「图片另存为」即可。
 
 ---
 
+## 📅 更新日志
+
+### v2.1.0 · 2026-09-15
+
+- 📱 **移动端滑动切题**：左滑进入下一题，右滑返回上一题；垂直滚动正常工作不拦截；保留原有上一题 / 下一题按钮，两种方式并存
+- 🪪 **内联 SVG favicon**：消除浏览器请求 `favicon.ico` 产生的 404 控制台噪音
+
+### v2.0.1 · 2026-09-15
+
+- 📖 **背题进度独立记录**：新增 `mg_back_seen` 存储浏览次数，刷题进度和背题进度互不干扰
+- 🏠 **首页双轨进度展示**：统计格从 4 格扩展到 5 格（新增紫色"已背"指标）；分类卡片进度条分两层——下层科目色表示刷题进度、上层紫色表示背题进度；卡片底部文字根据实际情况智能切换"已刷 X / 已背 Y 题"
+- 🎨 **知识点标签显示**：刷题判分后、背题模式下，答案解析下方新增紫色"🏷️ 知识点"胶囊标签
+
+### v2.0.0 · 2026-09-15
+
+- 🆕 **全新 972 题题库**：直接从超星考试详情页提取（而非 docx 解析），**100% 含答案解析 + 知识点标签**
+  - 高等教育学：472 题（单选 304 / 多选 83 / 判断 85）
+  - 高等教育心理学：500 题（单选 135 / 多选 109 / 判断 256）
+- 🏗️ **前端全面重构**：建立设计令牌系统（间距 / 圆角 / 阴影 / 动效曲线统一为 CSS 变量），全页消除硬编码值
+- 🎨 **科目配色区分**：教育学卡片用 teal 青绿色系，心理学卡片用 violet 紫色系，扫一眼即可分辨归属
+- 📊 **三级视觉层次**：答案反馈（最醒目）→ 解析（中等权重，淡蓝背景 + 左边框）→ 知识点（最轻量，紫色胶囊）
+- 🔗 **Netlify 体验地址上线**：`https://6aa7f67f3215ae0008a541c0--liangxue-pass.netlify.app/`
+
+### v1.0.1 · 2026-09-15
+
+- 🖼️ **打赏二维码居中 + 点击放大 Lightbox**：支持 Esc / 点击空白 / 点击 ✕ 三种关闭方式，放大页提示"右键另存为"
+- 🔄 **上一题 / 下一题按钮改回流式布局**
+
+### v1.0.0 · 2026-09-14
+
+- 🎓 **两学题库刷题 + 背题应用初始版本**
+- 📝 单选 / 多选 / 判断三种题型，刷题即时判分、背题答案直接展示
+- 🎯 顺序 / 随机模式、进度记忆、错题本、收藏夹
+- 💾 localStorage 数据持久化（答题记录、收藏、位置、模式）
+- ⌨️ PC 快捷键支持（A-D 选择、Enter 确认、← → 切题、Esc 关闭弹窗）
+- 📱 移动端单列布局 + 底部固定操作条
+
+---
+
 ## 👤 开发信息
 
-- **版本**：MindGym v2.0.0
+- **版本**：MindGym v2.1.0
 - **GitHub**：[https://github.com/AlbertSong1024/MindGym](https://github.com/AlbertSong1024/MindGym)
 - **Netlify 体验**：[https://6aa7f67f3215ae0008a541c0--liangxue-pass.netlify.app/](https://6aa7f67f3215ae0008a541c0--liangxue-pass.netlify.app/)
 - **GitHub Pages**：[https://albertsong1024.github.io/MindGym/](https://albertsong1024.github.io/MindGym/)

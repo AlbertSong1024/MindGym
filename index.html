@@ -76,13 +76,13 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .hero p{color:var(--ink-3);font-size:.9rem;margin-top:var(--xs);letter-spacing:.2px}
 
 /* --- 统计条 --- */
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sm);margin:var(--lg) 0}
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:var(--sm);margin:var(--lg) 0}
 .stat{background:var(--surface);border-radius:var(--r-lg);padding:var(--md) var(--sm);text-align:center;box-shadow:var(--sh-sm);border:1px solid var(--line);transition:transform .2s var(--ease),box-shadow .2s}
 .stat:hover{transform:translateY(-1px);box-shadow:var(--sh-md)}
-.stat b{font-size:1.3rem;display:block;font-variant-numeric:tabular-nums;line-height:1.2}
+.stat b{font-size:1.25rem;display:block;font-variant-numeric:tabular-nums;line-height:1.2}
 .stat span{font-size:.72rem;color:var(--ink-3);margin-top:2px;display:block}
 .stat.total b{color:var(--primary)} .stat.right b{color:var(--ok)}
-.stat.wrong b{color:var(--bad)}  .stat.fav b{color:var(--warn)}
+.stat.wrong b{color:var(--bad)}  .stat.fav b{color:var(--warn)} .stat.back b{color:var(--psy)}
 
 /* --- 模式切换 --- */
 .mode-row{
@@ -129,8 +129,9 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .cat-card h3{font-size:.95rem;font-weight:600;color:var(--ink)}
 .cat-card .num{font-size:.78rem;color:var(--ink-3)}
 .cat-card .num b{color:var(--ink-2);font-size:.85rem;font-variant-numeric:tabular-nums}
-.bar{height:5px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar{height:5px;background:var(--line);border-radius:99px;overflow:hidden;position:relative}
 .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--primary),var(--edu));border-radius:99px;transition:width .5s var(--ease)}
+.bar i.bar-back{position:absolute;left:0;top:0;background:linear-gradient(90deg,var(--psy),#a78bfa);opacity:.55;z-index:0}
 .cat-card[data-subject="高等教育学"] .bar i{background:linear-gradient(90deg,var(--edu),#2dd4bf)}
 .cat-card[data-subject="高等教育心理学"] .bar i{background:linear-gradient(90deg,var(--psy),#a78bfa)}
 .cat-card .go{color:var(--primary);font-size:.82rem;font-weight:600;display:flex;justify-content:space-between;align-items:center}
@@ -337,10 +338,10 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
   html{font-size:15px}
   .container{padding:0 var(--md) calc(var(--2xl) + var(--safe-b))}
   .hero h1{font-size:1.35rem}
-  .stats-row{grid-template-columns:repeat(4,1fr);gap:6px}
+  .stats-row{grid-template-columns:repeat(5,1fr);gap:4px}
   .stat{padding:var(--sm) 2px;border-radius:var(--r-md)}
-  .stat b{font-size:1.05rem}
-  .stat span{font-size:.65rem}
+  .stat b{font-size:.95rem}
+  .stat span{font-size:.6rem}
   .cat-grid,.quick-grid{grid-template-columns:1fr}
   .qcard{padding:var(--lg) var(--md);border-radius:var(--r-lg)}
   .qtext{font-size:1rem}
@@ -411,9 +412,10 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
     </div>
 
     <div class="stats-row" id="stats-row">
-      <div class="stat total"><b>0</b><span>已刷题数</span></div>
-      <div class="stat right"><b>0%</b><span>正确率</span></div>
+      <div class="stat total"><b>0</b><span>已刷</span></div>
+      <div class="stat right"><b>—</b><span>正确率</span></div>
       <div class="stat wrong"><b>0</b><span>错题</span></div>
+      <div class="stat back"><b>0</b><span>已背</span></div>
       <div class="stat fav"><b>0</b><span>收藏</span></div>
     </div>
 
@@ -560,12 +562,22 @@ var store = {
 var statusMap = store.get('mg_status', {});
 var favSet    = store.get('mg_fav', []);
 var posMap    = store.get('mg_pos', {});
+var backSeen  = store.get('mg_back_seen', {});   // 背题浏览记录 {题id: 浏览次数}
 var mode      = store.get('mg_mode', 'order');
 var backMode  = store.get('mg_back', false);
 var session   = null;
 
 function saveStatus(){ store.set('mg_status', statusMap); }
 function saveFav(){ store.set('mg_fav', favSet); }
+function saveBackSeen(){ store.set('mg_back_seen', backSeen); }
+/* 背题模式：记录当前 session 已浏览的所有题 */
+function recordBackSeen() {
+  if (!session || !session.sMode) return;
+  session.list.slice(0, session.idx + 1).forEach(function (q) {
+    backSeen[q.id] = (backSeen[q.id] || 0) + 1;
+  });
+  saveBackSeen();
+}
 
 /* ---------- 数据检索 ---------- */
 var byId = {};
@@ -599,16 +611,21 @@ function goHome() {
 function catDone(list) {
   return list.filter(function (q) { return statusMap[q.id]; }).length;
 }
+function catBackDone(list) {
+  return list.filter(function (q) { return backSeen[q.id]; }).length;
+}
 function renderHome() {
   var done = 0, right = 0, wrong = 0;
   QUESTIONS.forEach(function (q) {
     var s = statusMap[q.id];
     if (s) { done++; if (s === 1) right++; else wrong++; }
   });
+  var backDone = Object.keys(backSeen).length;
   var acc = done ? Math.round(right / done * 100) + '%' : '—';
   var stats = document.querySelectorAll('#stats-row .stat b');
   stats[0].textContent = done; stats[1].textContent = acc;
-  stats[2].textContent = wrong; stats[3].textContent = favSet.length;
+  stats[2].textContent = wrong; stats[3].textContent = backDone;
+  stats[4].textContent = favSet.length;
   document.getElementById('quick-wrong-n').textContent = wrong + ' 道错题 · 消灭它';
   document.getElementById('quick-fav-n').textContent = favSet.length + ' 道收藏';
   document.getElementById('quick-all-n').textContent = '从 ' + QUESTIONS.length + ' 题中随机抽取模拟练习';
@@ -619,20 +636,44 @@ function renderHome() {
     TYPES.forEach(function (type) {
       var list = pick(sub, type);
       var doneN = catDone(list);
-      var pct = list.length ? Math.round(doneN / list.length * 100) : 0;
+      var backN = catBackDone(list);
+      var pct = list.length ? Math.round(Math.max(doneN, backN) / list.length * 100) : 0;
       var card = document.createElement('button');
       card.className = 'cat-card';
       card.dataset.subject = sub;
       card.onclick = function () { startCat(sub, type); };
+
+      /* 进度条叠加：上层背题（紫色），下层刷题（按科目） */
+      var barHtml = '<div class="bar"><i style="width:' + pct + '%"></i>';
+      if (backN > doneN) {
+        barHtml += '<i class="bar-back" style="width:' + Math.round(backN / list.length * 100) + '%"></i>';
+      }
+      barHtml += '</div>';
+
+      /* 双轨进度文本 */
+      var progressLabel;
+      if (doneN && backN && doneN !== backN) {
+        progressLabel = '<div class="num">共 <b>' + list.length + '</b> 题 · 已刷 <b>' + doneN + '</b> / 已背 <b>' + backN + '</b></div>';
+      } else if (doneN) {
+        progressLabel = '<div class="num">共 <b>' + list.length + '</b> 题 · 已刷 <b>' + doneN + '</b> 题</div>';
+      } else if (backN) {
+        progressLabel = '<div class="num">共 <b>' + list.length + '</b> 题 · 已背 <b>' + backN + '</b> 题</div>';
+      } else {
+        progressLabel = '<div class="num">共 <b>' + list.length + '</b> 题 · 未开始</div>';
+      }
+
+      var startLabel = backN && !doneN
+        ? '继续背题' : doneN ? '继续刷题' : '开始刷题';
+
       card.innerHTML =
         '<div class="head">' +
           '<span class="badge s' + (si + 1) + '">' + sub + '</span>' +
           '<span class="badge t' + type + '">' + type + '</span>' +
         '</div>' +
         '<h3>' + sub + ' · ' + type + '题</h3>' +
-        '<div class="num">共 <b>' + list.length + '</b> 题 · 已刷 <b>' + doneN + '</b> 题</div>' +
-        '<div class="bar"><i style="width:' + pct + '%"></i></div>' +
-        '<div class="go"><span>' + (doneN ? '继续刷题' : '开始刷题') + '</span><span>' + pct + '% →</span></div>';
+        progressLabel +
+        barHtml +
+        '<div class="go"><span>' + startLabel + '</span><span>' + pct + '% →</span></div>';
       grid.appendChild(card);
     });
   });
@@ -932,6 +973,10 @@ function move(dir) {
   if (dir > 0 && session.idx === session.list.length - 1) {
     var total = session.list.length;
     if (session.sMode) {
+      recordBackSeen();
+      /* 背题完成 → 清除 posMap 下次从头来；backSeen 保留 */
+      if (session.key && session.key.indexOf('back:') === 0) delete posMap[session.key];
+      store.set('mg_pos', posMap);
       goHome();
       alert('背题完成！共浏览 ' + total + ' 题。');
       return;
@@ -954,6 +999,8 @@ function move(dir) {
   if (shouldRecord) {
     posMap[session.key] = next; store.set('mg_pos', posMap);
   }
+  /* 背题：每次翻页都持久化浏览记录 */
+  if (session.sMode) recordBackSeen();
   renderQuestion();
 }
 

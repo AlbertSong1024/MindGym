@@ -12,7 +12,7 @@
 
 | 环境 | 地址 |
 |------|------|
-| Netlify 体验 | 👉 [https://6aa7f67f3215ae0008a541c0--liangxue-pass.netlify.app/](https://6aa7f67f3215ae0008a541c0--liangxue-pass.netlify.app/) |
+| Netlify 体验 | 👉 [https://liangxue-pass.netlify.app/](https://liangxue-pass.netlify.app/) |
 | GitHub Pages | [https://albertsong1024.github.io/MindGym/](https://albertsong1024.github.io/MindGym/) |
 
 ---
@@ -260,7 +260,7 @@ A：直接点击二维码放大后右键「图片另存为」即可。
 - 🏗️ **前端全面重构**：建立设计令牌系统（间距 / 圆角 / 阴影 / 动效曲线统一为 CSS 变量），全页消除硬编码值
 - 🎨 **科目配色区分**：教育学卡片用 teal 青绿色系，心理学卡片用 violet 紫色系，扫一眼即可分辨归属
 - 📊 **三级视觉层次**：答案反馈（最醒目）→ 解析（中等权重，淡蓝背景 + 左边框）→ 知识点（最轻量，紫色胶囊）
-- 🔗 **Netlify 体验地址上线**：`https://6aa7f67f3215ae0008a541c0--liangxue-pass.netlify.app/`
+- 🔗 **Netlify 体验地址上线**：`https://liangxue-pass.netlify.app/`
 
 ### v1.0.1 · 2026-09-15
 
@@ -282,6 +282,7 @@ A：直接点击二维码放大后右键「图片另存为」即可。
 
 - **版本**：MindGym v2.1.0
 - **GitHub**：[https://github.com/AlbertSong1024/MindGym](https://github.com/AlbertSong1024/MindGym)
-- **Netlify 体验**：[https://6aa7f67f3215ae0008a541c0--liangxue-pass.netlify.app/](https://6aa7f67f3215ae0008a541c0--liangxue-pass.netlify.app/)
+- **Netlify 体验**：[https://liangxue-pass.netlify.app/](https://liangxue-pass.netlify.app/)
 - **GitHub Pages**：[https://albertsong1024.github.io/MindGym/](https://albertsong1024.github.io/MindGym/)
 - **技术交流 / 反馈邮箱**：[albert.song@foxmail.com](mailto:albert.song@foxmail.com)
+

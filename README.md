@@ -1,16 +1,19 @@
-# MindGym v1.0.0 · 两学题库刷题应用
+# MindGym v2.0.0 · 两学题库刷题应用
 
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
-[![Version](https://img.shields.io/badge/version-v1.0.0-blue.svg)](https://github.com/AlbertSong1024/MindGym)
+[![Version](https://img.shields.io/badge/version-v2.0.0-blue.svg)](https://github.com/AlbertSong1024/MindGym)
 [![Stars](https://img.shields.io/badge/stars-⭐-yellow.svg)](https://github.com/AlbertSong1024/MindGym)
 
-纯前端、零依赖的刷题 + 背题应用，题库来自《两学题库-合成版.docx》。覆盖 **高等教育学** 与 **高等教育心理学** 两科共 **973 道题**（单选 / 多选 / 判断三种题型），适配 PC 端和移动端，双击即可使用，无需服务器、无需联网。
+纯前端、零依赖的刷题 + 背题应用，题库直接来自超星考试详情页提取。覆盖 **高等教育学** 与 **高等教育心理学** 两科共 **972 道题**（单选 / 多选 / 判断三种题型，100% 含答案解析和知识点标签），适配 PC 端和移动端，双击即可使用，无需服务器、无需联网。
 
 ---
 
 ## ✨ 在线预览
 
-👉 [https://albertsong1024.github.io/MindGym/](https://albertsong1024.github.io/MindGym/)
+| 环境 | 地址 |
+|------|------|
+| Netlify 体验 | 👉 [https://6aa7f67f3215ae0008a541c0--liangxue-pass.netlify.app/](https://6aa7f67f3215ae0008a541c0--liangxue-pass.netlify.app/) |
+| GitHub Pages | [https://albertsong1024.github.io/MindGym/](https://albertsong1024.github.io/MindGym/) |
 
 ---
 
@@ -18,9 +21,9 @@
 
 | 学科 | 单选 | 多选 | 判断 | 合计 |
 |---|---|---|---|---|
-| 高等教育学 | 227 | 83 | 85 | 395 |
-| 高等教育心理学 | 212 | 109 | 257 | 578 |
-| **合计** | **439** | **192** | **342** | **973** |
+| 高等教育学 | 304 | 83 | 85 | 472 |
+| 高等教育心理学 | 135 | 109 | 256 | 500 |
+| **合计** | **439** | **192** | **341** | **972** |
 
 应用按「学科 × 题型」自动拆为 6 个分类，可单独刷 / 背，也可全库随机练习。
 
@@ -238,7 +241,8 @@ A：直接点击二维码放大后右键「图片另存为」即可。
 
 ## 👤 开发信息
 
-- **版本**：MindGym v1.0.0
+- **版本**：MindGym v2.0.0
 - **GitHub**：[https://github.com/AlbertSong1024/MindGym](https://github.com/AlbertSong1024/MindGym)
-- **部署地址**：[https://albertsong1024.github.io/MindGym/](https://albertsong1024.github.io/MindGym/)
+- **Netlify 体验**：[https://6aa7f67f3215ae0008a541c0--liangxue-pass.netlify.app/](https://6aa7f67f3215ae0008a541c0--liangxue-pass.netlify.app/)
+- **GitHub Pages**：[https://albertsong1024.github.io/MindGym/](https://albertsong1024.github.io/MindGym/)
 - **技术交流 / 反馈邮箱**：[albert.song@foxmail.com](mailto:albert.song@foxmail.com)

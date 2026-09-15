@@ -172,6 +172,9 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .prev-state.show{display:inline-block}
 .prev-state.was-wrong{color:var(--bad);background:var(--bad-soft);font-weight:500}
 .prev-state.was-right{color:var(--ok);background:var(--ok-soft);font-weight:500}
+.auto-next{margin-left:auto;font-size:.72rem;padding:4px 12px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink-3);cursor:pointer;transition:border-color .2s,color .2s,background .2s}
+.auto-next:hover{border-color:var(--primary);color:var(--primary)}
+.auto-next.on{border-color:var(--ok);color:var(--ok);background:var(--ok-soft);font-weight:500}
 
 /* --- 题目卡片 --- */
 .qcard{
@@ -480,6 +483,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
       <div class="quiz-meta">
         <span class="qpos"><b id="q-idx">1</b> / <span id="q-total">1</span></span>
         <span class="prev-state" id="prev-state"></span>
+        <button class="auto-next" id="auto-btn" title="答对后自动切到下一题，答错则手动切换" onclick="toggleAuto()">自动下一题</button>
       </div>
       <div class="progressbar"><i id="q-progress" style="width:0%"></i></div>
     </div>
@@ -566,17 +570,20 @@ var posMap    = store.get('mg_pos', {});
 var backSeen  = store.get('mg_back_seen', {});   // 背题浏览记录 {题id: 浏览次数}
 var mode      = store.get('mg_mode', 'order');
 var backMode  = store.get('mg_back', false);
+var autoNext  = store.get('mg_autonext', false);   // 刷题：答对后自动切下一题
 var session   = null;
 
 function saveStatus(){ store.set('mg_status', statusMap); }
 function saveFav(){ store.set('mg_fav', favSet); }
 function saveBackSeen(){ store.set('mg_back_seen', backSeen); }
-/* 背题模式：记录当前 session 已浏览的所有题 */
-function recordBackSeen() {
+/* 背题模式：精确记录「进入当前题」的浏览次数。
+ * 每次只对当前题 +1，避免旧实现对 0..idx 前缀整体累加导致的浏览次数虚高；
+ * 也保证「至少背过的题」（首页统计）与单题浏览次数语义都正确。 */
+function markBackSeenAt(idx) {
   if (!session || !session.sMode) return;
-  session.list.slice(0, session.idx + 1).forEach(function (q) {
-    backSeen[q.id] = (backSeen[q.id] || 0) + 1;
-  });
+  var q = session.list[idx];
+  if (!q) return;
+  backSeen[q.id] = (backSeen[q.id] || 0) + 1;
   saveBackSeen();
 }
 
@@ -701,6 +708,7 @@ function newSession(key, title, list, sMode) {
   document.getElementById('quiz-title').textContent = title;
   show('view-quiz');
   renderQuestion();
+  markBackSeenAt(startIdx);   /* 背题：首次进入即计一次浏览 */
 }
 
 function startCat(sub, type) {
@@ -769,6 +777,10 @@ function renderQuestion() {
   document.getElementById('btn-prev').disabled = session.idx === 0;
   document.getElementById('btn-next').textContent =
     session.idx === total - 1 ? '完成' : '下一题 →';
+  /* 自动下一题开关：背题模式无意义，隐藏 */
+  document.getElementById('auto-btn').style.display =
+    session.sMode ? 'none' : 'inline-block';
+  paintAutoBtn();
 }
 
 function renderBack(q) {
@@ -959,6 +971,12 @@ function settle(q, sel) {
   statusMap[q.id] = ok ? 1 : 2;
   saveStatus();
   renderQuestion();
+  /* 答对 + 开启自动下一题（且非背题）→ 稍作停顿让反馈可见后自动切题 */
+  if (ok && autoNext && !session.sMode) {
+    setTimeout(function () {
+      if (session && session.picked[curQ().id]) move(1);
+    }, 450);
+  }
 }
 
 /* ---------- 收藏 ---------- */
@@ -970,6 +988,19 @@ function toggleFav() {
   renderQuestion();
 }
 
+/* ---------- 答对自动下一题 ---------- */
+function toggleAuto() {
+  autoNext = !autoNext;
+  store.set('mg_autonext', autoNext);
+  paintAutoBtn();
+}
+function paintAutoBtn() {
+  var b = document.getElementById('auto-btn');
+  if (!b) return;
+  b.classList.toggle('on', autoNext);
+  b.textContent = autoNext ? '✓ 自动下一题' : '自动下一题';
+}
+
 /* ---------- 移动 ---------- */
 function move(dir) {
   if (!session) return;
@@ -977,8 +1008,7 @@ function move(dir) {
   if (dir > 0 && session.idx === session.list.length - 1) {
     var total = session.list.length;
     if (session.sMode) {
-      recordBackSeen();
-      /* 背题完成 → 清除 posMap 下次从头来；backSeen 保留 */
+      /* 背题完成 → 清除 posMap 下次从头来；backSeen 保留（该题进入时已计数） */
       if (session.key && session.key.indexOf('back:') === 0) delete posMap[session.key];
       store.set('mg_pos', posMap);
       goHome();
@@ -1003,8 +1033,8 @@ function move(dir) {
   if (shouldRecord) {
     posMap[session.key] = next; store.set('mg_pos', posMap);
   }
-  /* 背题：每次翻页都持久化浏览记录 */
-  if (session.sMode) recordBackSeen();
+  /* 背题：每翻到新题都将其精确计入浏览（含下一题 / 上一题 / 滑动） */
+  markBackSeenAt(next);
   renderQuestion();
 }
 
@@ -1024,7 +1054,7 @@ function renderSheet() {
       var rec = session.picked[q.id];
       if (rec) b.classList.add(rec.ok ? 'right' : 'wrong');
       if (i === session.idx) b.classList.add('cur');
-      b.onclick = function () { session.idx = i; renderQuestion(); };
+      b.onclick = function () { session.idx = i; markBackSeenAt(i); renderQuestion(); };
       grid.appendChild(b);
     });
     headBtn.textContent = '收起';
@@ -1115,39 +1145,91 @@ document.addEventListener('keydown', function (e) {
   if (L && q.type !== '判断') { pickOption(L); }
 });
 
-/* ---------- 移动端滑动切题 ---------- */
+/* ---------- 移动端滑动切题（带过渡动画） ---------- */
 (function () {
   var THRESHOLD = 50;       /* 超过此水平位移（px）才触发翻页 */
-  var MAX_VERT  = 60;       /* 垂直位移超过此值则判定为滚动，不触发翻页 */
+  var DRAG_MAX  = 90;       /* 跟手拖动的最大位移（超出做阻尼钳制） */
   var EDGE_PAD  = 20;       /* 左右边缘保留区域，避免和 iOS 返回手势冲突 */
-  var swipe = { active: false, startX: 0, startY: 0, dx: 0, dy: 0, fired: false };
+  var swipe = { active: false, exiting: false, startX: 0, startY: 0, dx: 0, dy: 0 };
+
+  var card = null;
+  function getCard() { return card || (card = document.querySelector('#view-quiz .qcard')); }
+
+  function resetCard() {
+    var c = getCard(); if (!c) return;
+    c.style.transition = 'none';
+    c.style.transform = '';
+    c.style.opacity = '';
+  }
 
   document.getElementById('view-quiz').addEventListener('touchstart', function (e) {
     if (!session) return;
     var t = e.touches[0];
-    swipe.active = true; swipe.fired = false;
+    swipe.active = true;
     swipe.startX = t.clientX; swipe.startY = t.clientY;
     swipe.dx = 0; swipe.dy = 0;
+    /* 动画还没跑完就再次触摸：中断上次动画，直接归位 */
+    if (swipe.exiting) { swipe.exiting = false; }
+    resetCard();
   }, { passive: true });
 
   document.getElementById('view-quiz').addEventListener('touchmove', function (e) {
-    if (!swipe.active || swipe.fired) return;
+    if (!swipe.active) return;
     var t = e.touches[0];
     swipe.dx = t.clientX - swipe.startX;
     swipe.dy = t.clientY - swipe.startY;
-  }, { passive: true });
+    /* 仅当水平主导且达到起始位移才拦截滚动、跟手拖动 */
+    if (Math.abs(swipe.dx) > Math.abs(swipe.dy) && Math.abs(swipe.dx) > 6) {
+      e.preventDefault();
+      var c = getCard();
+      if (c) {
+        var d = Math.max(-DRAG_MAX, Math.min(DRAG_MAX, swipe.dx));
+        c.style.transform = 'translateX(' + (d * 0.82) + 'px)';
+        c.style.opacity = String(1 - Math.min(0.25, Math.abs(d) / (THRESHOLD * 4)));
+      }
+    }
+  }, { passive: false });
 
   document.getElementById('view-quiz').addEventListener('touchend', function (e) {
-    if (!swipe.active || swipe.fired) return;
+    if (!swipe.active || swipe.exiting) return;
     swipe.active = false;
-    /* 边缘区域 → 跳过（让浏览器/系统处理） */
-    if (swipe.startX < EDGE_PAD || swipe.startX > window.innerWidth - EDGE_PAD) return;
-    /* 垂直位移主导 → 页面滚动，不拦截 */
-    if (Math.abs(swipe.dy) > Math.abs(swipe.dx)) return;
-    if (Math.abs(swipe.dx) < THRESHOLD) return;
-    swipe.fired = true;
-    if (swipe.dx < 0) move(1);   /* 向左滑 → 下一题 */
-    else              move(-1);  /* 向右滑 → 上一题 */
+    var c = getCard();
+    /* 边缘区域 → 跳过并复位 */
+    if (swipe.startX < EDGE_PAD || swipe.startX > window.innerWidth - EDGE_PAD) {
+      resetCard(); return;
+    }
+    /* 垂直位移主导 → 页面滚动，复位不翻页 */
+    if (Math.abs(swipe.dy) > Math.abs(swipe.dx)) { resetCard(); return; }
+    if (Math.abs(swipe.dx) < THRESHOLD) { resetCard(); return; }
+
+    swipe.exiting = true;
+    var dir = swipe.dx < 0 ? 1 : -1;   /* 向左滑 → 下一题(1)；向右滑 → 上一题(-1) */
+
+    /* 滑出动画：向左滑出(下一题)用 -100%，向右(上一题)用 +100% */
+    if (c) {
+      c.style.transition = 'transform .22s ease, opacity .22s ease';
+      c.style.transform = 'translateX(' + (dir > 0 ? -100 : 100) + '%)';
+      c.style.opacity = '0';
+    }
+    setTimeout(function () {
+      move(dir);
+      swipe.exiting = false;
+      /* 入场动画：从滑入方向进入（下一题从左→中，上一题从右→中） */
+      if (c) {
+        c.style.transition = 'none';
+        c.style.transform = 'translateX(' + (dir > 0 ? 100 : -100) + '%)';
+        c.style.opacity = '1';
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            if (c) {
+              c.style.transition = 'transform .3s ease, opacity .3s ease';
+              c.style.transform = 'translateX(0)';
+              c.style.opacity = '1';
+            }
+          });
+        });
+      }
+    }, 225);
   }, { passive: true });
 })();
 

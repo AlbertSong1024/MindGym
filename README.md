@@ -1,7 +1,7 @@
-# MindGym v2.1.0 · 两学题库刷题应用
+# MindGym v2.2.0 · 两学题库刷题应用
 
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
-[![Version](https://img.shields.io/badge/version-v2.1.0-blue.svg)](https://github.com/AlbertSong1024/MindGym)
+[![Version](https://img.shields.io/badge/version-v2.2.0-blue.svg)](https://github.com/AlbertSong1024/MindGym)
 [![Stars](https://img.shields.io/badge/stars-⭐-yellow.svg)](https://github.com/AlbertSong1024/MindGym)
 
 纯前端、零依赖的刷题 + 背题应用，题库直接来自超星考试详情页提取。覆盖 **高等教育学** 与 **高等教育心理学** 两科共 **972 道题**（单选 / 多选 / 判断三种题型，100% 含答案解析和知识点标签），适配 PC 端和移动端，双击即可使用，无需服务器、无需联网。
@@ -241,6 +241,12 @@ A：直接点击二维码放大后右键「图片另存为」即可。
 
 ## 📅 更新日志
 
+### v2.2.0 · 2026-09-15
+
+- ✨ **答对自动下一题开关**：刷题页新增「自动下一题」胶囊按钮，打开后答对自动切到下一题（稍作停顿显示反馈），答错则手动切换；状态记忆，背题模式自动隐藏
+- 🖼️ **滑动切题过渡动画**：移动端滑动时卡片跟手拖动，松手后带滑出＋回弹过渡动画，垂直滚动/短滑不误触；答题卡跳题、上一题/下一题/滑动三种切题方式的背题进度记录现已完全一致
+- 🐛 **修复背题进度记录**：浏览次数改为每进入一题精确 +1（修复旧实现的整体累加虚高）；答题卡直接跳题也会记录浏览进度
+
 ### v2.1.0 · 2026-09-15
 
 - 📱 **移动端滑动切题**：左滑进入下一题，右滑返回上一题；垂直滚动正常工作不拦截；保留原有上一题 / 下一题按钮，两种方式并存
@@ -280,7 +286,7 @@ A：直接点击二维码放大后右键「图片另存为」即可。
 
 ## 👤 开发信息
 
-- **版本**：MindGym v2.1.0
+- **版本**：MindGym v2.2.0
 - **GitHub**：[https://github.com/AlbertSong1024/MindGym](https://github.com/AlbertSong1024/MindGym)
 - **Netlify 体验**：[https://liangxue-pass.netlify.app/](https://liangxue-pass.netlify.app/)
 - **GitHub Pages**：[https://albertsong1024.github.io/MindGym/](https://albertsong1024.github.io/MindGym/)

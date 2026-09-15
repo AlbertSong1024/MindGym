@@ -821,6 +821,9 @@ function renderBack(q) {
 function renderOptions(q) {
   var box = document.getElementById('q-options');
   var judge = document.getElementById('q-judge');
+  var backAns = document.getElementById('back-ans');
+  /* 刷题模式绝不允许残留背题答案卡（从背题切换回刷题时会残留） */
+  if (backAns) backAns.style.display = 'none';
   var rec = session.picked[q.id];
 
   if (q.type === '判断') {

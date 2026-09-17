@@ -1,7 +1,7 @@
-# MindGym v2.2.1 · 两学题库刷题应用
+# MindGym v2.2.2 · 两学题库刷题应用
 
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
-[![Version](https://img.shields.io/badge/version-v2.2.1-blue.svg)](https://github.com/AlbertSong1024/MindGym)
+[![Version](https://img.shields.io/badge/version-v2.2.2-blue.svg)](https://github.com/AlbertSong1024/MindGym)
 [![Stars](https://img.shields.io/badge/stars-⭐-yellow.svg)](https://github.com/AlbertSong1024/MindGym)
 
 纯前端、零依赖的刷题 + 背题应用，题库直接来自超星考试详情页提取。覆盖 **高等教育学** 与 **高等教育心理学** 两科共 **972 道题**（单选 / 多选 / 判断三种题型，100% 含答案解析和知识点标签），适配 PC 端和移动端，双击即可使用，无需服务器、无需联网。
@@ -241,6 +241,10 @@ A：直接点击二维码放大后右键「图片另存为」即可。
 
 ## 📅 更新日志
 
+### v2.2.2 · 2026-09-17
+
+- 🐛 **修复「已背」进度与刷题/背题不一致**：此前只有背题模式会累计浏览记录，刷题模式下翻题不计入，导致主页「已背」停留在旧值（如刷到 122 题却显示 41）。现改为刷题与背题任一模式下翻到的题都会累计，主页统计与实际浏览进度实时同步
+
 ### v2.2.1 · 2026-09-17
 
 - 👀 **访问统计**：页脚新增「不蒜子」访问统计行，展示总访问次数与访客人数（按域名独立计数）；离线双击打开或统计服务不可用时整行自动隐藏，不影响使用
@@ -290,7 +294,7 @@ A：直接点击二维码放大后右键「图片另存为」即可。
 
 ## 👤 开发信息
 
-- **版本**：MindGym v2.2.1
+- **版本**：MindGym v2.2.2
 - **GitHub**：[https://github.com/AlbertSong1024/MindGym](https://github.com/AlbertSong1024/MindGym)
 - **Netlify 体验**：[https://liangxue-pass.netlify.app/](https://liangxue-pass.netlify.app/)
 - **GitHub Pages**：[https://albertsong1024.github.io/MindGym/](https://albertsong1024.github.io/MindGym/)

@@ -580,11 +580,12 @@ var session   = null;
 function saveStatus(){ store.set('mg_status', statusMap); }
 function saveFav(){ store.set('mg_fav', favSet); }
 function saveBackSeen(){ store.set('mg_back_seen', backSeen); }
-/* 背题模式：精确记录「进入当前题」的浏览次数。
- * 每次只对当前题 +1，避免旧实现对 0..idx 前缀整体累加导致的浏览次数虚高；
- * 也保证「至少背过的题」（首页统计）与单题浏览次数语义都正确。 */
+/* 记录「翻到/进入当前题」的浏览次数。
+ * 刷题、背题任一模式下，翻到某题都计入该题浏览 → 首页「已背」数量与
+ * 实际浏览进度保持一致（用户诉求：刷题和背题都要与主页显示的背题数量同步）。
+ * 每次只对当前题 +1，避免旧实现对 0..idx 前缀整体累加导致的浏览次数虚高。 */
 function markBackSeenAt(idx) {
-  if (!session || !session.sMode) return;
+  if (!session) return;
   var q = session.list[idx];
   if (!q) return;
   backSeen[q.id] = (backSeen[q.id] || 0) + 1;

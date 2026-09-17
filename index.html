@@ -456,9 +456,13 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 
     <!-- ==================== Footer ==================== -->
     <div class="footer">
-      <div class="ft-head">MindGym <span class="ft-ver">v2.0</span></div>
+      <div class="ft-head">MindGym <span class="ft-ver">v2.2.1</span></div>
       <div class="ft-row"><span class="ft-label">版权</span><span>© 2026 柠檬茶有力气 · All rights reserved.</span></div>
       <div class="ft-row"><span class="ft-label">联系</span><a href="mailto:albert.song@foxmail.com">albert.song@foxmail.com</a></div>
+      <div class="ft-row">
+        <!-- 不蒜子访问统计：容器默认隐藏，脚本加载成功后自动显示；离线/服务不可用时整行隐藏 -->
+        <span id="busuanzi_container_site_pv" style="display:none"><span class="ft-label">统计</span>👀 总访问 <b id="busuanzi_value_site_pv">…</b> 次 · 访客 <b id="busuanzi_value_site_uv">…</b> 人</span>
+      </div>
       <div class="ft-warn">📚 题库内容仅供学习参考，如有侵权请联系删除</div>
       <div class="ft-donate">
         <div class="ft-donate-title"><span class="coffee">☕</span>如果这个工具帮到了你，请我喝杯咖啡吧～</div>
@@ -1251,5 +1255,7 @@ document.addEventListener('click', function (e) {
 /* ---------- 启动 ---------- */
 renderHome();
 </script>
+<!-- 不蒜子访问统计：免费计数服务，无需注册；数据按域名独立统计 -->
+<script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 </body>
 </html>

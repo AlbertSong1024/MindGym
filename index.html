@@ -1256,7 +1256,16 @@ document.addEventListener('click', function (e) {
 /* ---------- 启动 ---------- */
 renderHome();
 </script>
-<!-- 不蒜子访问统计：免费计数服务，无需注册；数据按域名独立统计 -->
-<script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<!-- 不蒜子访问统计：在线(HTTP/HTTPS)才加载，避免 file:// 双击打开时的 jsonp 请求被浏览器拦截产生报错 -->
+<script>
+(function () {
+  /* file:// 协议下不蒜子的 jsonp 用协议相对 URL 会被解析为 file:// 并被拦截，故不加载 */
+  if (location.protocol === 'file:') return;
+  var s = document.createElement('script');
+  s.src = 'https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';
+  s.async = true;
+  document.body.appendChild(s);
+})();
+</script>
 </body>
 </html>

@@ -1,7 +1,7 @@
-# MindGym v2.2.2 · 两学题库刷题应用
+# MindGym v2.3.0 · 两学题库刷题应用
 
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
-[![Version](https://img.shields.io/badge/version-v2.2.2-blue.svg)](https://github.com/AlbertSong1024/MindGym)
+[![Version](https://img.shields.io/badge/version-v2.3.0-blue.svg)](https://github.com/AlbertSong1024/MindGym)
 [![Stars](https://img.shields.io/badge/stars-⭐-yellow.svg)](https://github.com/AlbertSong1024/MindGym)
 
 纯前端、零依赖的刷题 + 背题应用，题库直接来自超星考试详情页提取。覆盖 **高等教育学** 与 **高等教育心理学** 两科共 **972 道题**（单选 / 多选 / 判断三种题型，100% 含答案解析和知识点标签），适配 PC 端和移动端，双击即可使用，无需服务器、无需联网。
@@ -241,6 +241,14 @@ A：直接点击二维码放大后右键「图片另存为」即可。
 
 ## 📅 更新日志
 
+### v2.3.0 · 2026-09-18
+
+- 🎧 **音频背题功能**：新增「音频背题」入口与连续播放器，把题目＋选项＋答案＋解析＋知识点合成为语音，走路 / 跑步 / 通勤时边听边背
+  - 基于 **Edge-TTS**（微软神经网络语音，晓晓女声，免费），本地批量生成 mp3，导入题库自动建立分类
+  - 播放器支持：播放/暂停、上一题/下一题、进度条、0.5x–2x 倍速、自动连播、随机/顺序模式、播放列表点选、题目详情同步高亮
+  - 运行 `python audio/generate_audio.py --sub 高等教育学 --type 判断` 即可生成（按分类）
+- 🖥️ **试点分类**：已预生成「高等教育学 · 判断」85 题语音（约 17MB），首页「🎧 音频背题」即可体验
+
 ### v2.2.2 · 2026-09-17
 
 - 🐛 **修复「已背」进度与刷题/背题不一致**：此前只有背题模式会累计浏览记录，刷题模式下翻题不计入，导致主页「已背」停留在旧值（如刷到 122 题却显示 41）。现改为刷题与背题任一模式下翻到的题都会累计，主页统计与实际浏览进度实时同步
@@ -294,7 +302,7 @@ A：直接点击二维码放大后右键「图片另存为」即可。
 
 ## 👤 开发信息
 
-- **版本**：MindGym v2.2.2
+- **版本**：MindGym v2.3.0
 - **GitHub**：[https://github.com/AlbertSong1024/MindGym](https://github.com/AlbertSong1024/MindGym)
 - **Netlify 体验**：[https://liangxue-pass.netlify.app/](https://liangxue-pass.netlify.app/)
 - **GitHub Pages**：[https://albertsong1024.github.io/MindGym/](https://albertsong1024.github.io/MindGym/)

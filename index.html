@@ -161,6 +161,54 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .quick.all span{max-width:60%}
 .quick:hover{transform:translateY(-2px);filter:brightness(1.05)}
 
+/* --- 音频背题 --- */
+.quick.audio{background:linear-gradient(135deg,#0ea5e9,#6366f1)}
+.audio-list{margin-top:var(--md);display:flex;flex-direction:column;gap:var(--sm)}
+.audio-cat{
+  display:flex;align-items:center;gap:var(--md);padding:var(--md) var(--lg);
+  border:1.5px solid var(--line);border-radius:var(--r-md);background:var(--surface);
+  cursor:pointer;transition:border-color .18s var(--ease),box-shadow .18s var(--ease),transform .18s;
+}
+.audio-cat:hover{border-color:var(--primary);box-shadow:var(--sh-sm);transform:translateY(-1px)}
+.audio-cat .ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex:none}
+.audio-cat .ic[data-sub="高等教育学"]{background:var(--edu-soft)}
+.audio-cat .ic[data-sub="高等教育心理学"]{background:var(--psy-soft)}
+.audio-cat .meta{flex:1;min-width:0}
+.audio-cat .meta b{display:block;font-size:.92rem;color:var(--ink)}
+.audio-cat .meta span{font-size:.75rem;color:var(--ink-3)}
+.audio-cat .play{color:var(--primary);font-size:.85rem;font-weight:600;flex:none}
+.audio-empty{padding:var(--xl);text-align:center;color:var(--ink-3);font-size:.85rem;border:1.5px dashed var(--line);border-radius:var(--r-md)}
+
+/* 播放器 */
+#view-audio .container{max-width:640px}
+.player{background:var(--surface);border-radius:var(--r-xl);box-shadow:var(--sh-md);border:1px solid var(--line);padding:var(--xl);margin-top:var(--lg)}
+.player .art{width:84px;height:84px;border-radius:50%;margin:0 auto var(--lg);display:flex;align-items:center;justify-content:center;font-size:2.2rem;color:#fff;background:linear-gradient(135deg,#0ea5e9,#6366f1);box-shadow:var(--sh-md)}
+.player .prog{flex:1}
+.progress{height:6px;background:var(--line);border-radius:99px;overflow:hidden;cursor:pointer}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,#0ea5e9,#6366f1);border-radius:99px}
+.player .time-row{display:flex;justify-content:space-between;font-size:.72rem;color:var(--ink-3);margin-top:4px;font-variant-numeric:tabular-nums}
+.player .ctrl{display:flex;align-items:center;justify-content:center;gap:var(--lg);margin-top:var(--lg)}
+.player .cbtn{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;background:var(--primary-soft);color:var(--primary);cursor:pointer;transition:background .18s var(--ease),transform .15s;border:none}
+.player .cbtn:hover{background:var(--primary);color:#fff}
+.player .cbtn:active{transform:scale(.92)}
+.player .cbtn.main{width:68px;height:68px;font-size:1.6rem;background:var(--primary);color:#fff}
+.player .cbtn.main:hover{background:#4338ca}
+.player .side{display:flex;gap:var(--sm);align-items:center;margin-top:var(--md)}
+.player .side select,.player .side button{font-size:.75rem;padding:4px 10px;border-radius:99px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink-2);cursor:pointer}
+.player .side select:focus,.player .side button:hover{border-color:var(--primary);color:var(--primary)}
+.player .txt{margin-top:var(--lg);padding-top:var(--lg);border-top:1px dashed var(--line)}
+.player .txt .qlabel{font-size:.72rem;color:var(--ink-3);margin-bottom:var(--sm);display:flex;align-items:center;gap:6px}
+.player .txt .qtext{font-size:.98rem;line-height:1.7;color:var(--ink)}
+.player .list-head{display:flex;align-items:center;justify-content:space-between;margin-top:var(--xl);margin-bottom:var(--sm)}
+.player .list-head b{font-size:.9rem;color:var(--ink-2)}
+.player .list-head button{font-size:.75rem;padding:3px 10px;border-radius:99px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink-3);cursor:pointer}
+.player .list-head button:hover{border-color:var(--primary);color:var(--primary)}
+.player .alist{list-style:none;display:flex;flex-direction:column}
+.player .alist li{display:flex;align-items:center;gap:var(--md);padding:10px var(--md);border-radius:var(--r-sm);cursor:pointer;font-size:.82rem;color:var(--ink-2)}
+.player .alist li:hover{background:var(--primary-soft)}
+.player .alist li.on{background:var(--primary-soft);color:var(--primary);font-weight:600}
+.player .alist li .n{font-size:.7rem;color:var(--ink-4);width:26px;font-variant-numeric:tabular-nums}
+
 /* ==================== 刷题页 ==================== */
 .quiz-head{padding:var(--lg) 0 0}
 .quiz-meta{display:flex;align-items:center;gap:var(--sm);flex-wrap:wrap}
@@ -452,11 +500,15 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
         <div><b>🎯 全库随机 100 题</b></div>
         <span id="quick-all-n">从 999 题中随机抽取模拟练习</span>
       </button>
+      <button class="quick audio" onclick="showAudioHome()" style="grid-column:1/-1;min-height:auto;padding:var(--lg) var(--xl);flex-direction:row;justify-content:space-between;align-items:center">
+        <div><b>🎧 音频背题</b></div>
+        <span>走路 · 跑步 · 通勤时边听边背</span>
+      </button>
     </div>
 
     <!-- ==================== Footer ==================== -->
     <div class="footer">
-      <div class="ft-head">MindGym <span class="ft-ver">v2.2.1</span></div>
+      <div class="ft-head">MindGym <span class="ft-ver">v2.3.0</span></div>
       <div class="ft-row"><span class="ft-label">版权</span><span>© 2026 柠檬茶有力气 · All rights reserved.</span></div>
       <div class="ft-row"><span class="ft-label">联系</span><a href="mailto:albert.song@foxmail.com">albert.song@foxmail.com</a></div>
       <div class="ft-row">
@@ -522,6 +574,53 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
         <span><i style="background:var(--bad)"></i>答错</span>
         <span><i style="background:#fff;border:1.5px solid var(--primary)"></i>当前题</span>
         <span><i style="background:#f1f5f9"></i>未做</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 音频背题页 ==================== -->
+<div class="view" id="view-audio">
+  <div class="topbar"><div class="topbar-inner">
+    <button class="back" onclick="exitAudio()">← 退出</button>
+    <div class="title" id="audio-title">音频背题</div>
+    <button class="icon-btn" id="audio-home-btn" title="返回分类" onclick="showAudioHome()" aria-label="返回">☰</button>
+  </div></div>
+  <div class="container">
+    <!-- 分类选择 -->
+    <div id="audio-cats"></div>
+    <!-- 播放器 -->
+    <div id="audio-player" style="display:none">
+      <div class="player">
+        <div class="art">🎧</div>
+        <div id="audio-qtext" style="text-align:center;font-size:1rem;font-weight:600;line-height:1.7;color:var(--ink);margin-bottom:var(--lg)"></div>
+        <div class="progress" id="audio-progress"><i></i></div>
+        <div class="time-row"><span id="audio-cur">0:00</span><span id="audio-dur">0:00</span></div>
+        <div class="ctrl">
+          <button class="cbtn" onclick="audioSkip(-1)" title="上一题">⏮</button>
+          <button class="cbtn main" id="audio-toggle" onclick="audioToggle()" title="播放/暂停">▶</button>
+          <button class="cbtn" onclick="audioSkip(1)" title="下一题">⏭</button>
+        </div>
+        <div class="side">
+          <select id="audio-rate" onchange="audioSetRate(this.value)" title="播放速度">
+            <option value="0.5">0.5x</option>
+            <option value="0.75">0.75x</option>
+            <option value="1" selected>1x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.5">1.5x</option>
+            <option value="2">2x</option>
+          </select>
+          <button id="audio-repeat" onclick="audioToggleRepeat()" title="自动连播（当前循环）">🔁 连播</button>
+        </div>
+        <div class="txt">
+          <div class="qlabel">📄 当前题目</div>
+          <div class="qtext" id="audio-detail"></div>
+        </div>
+        <div class="list-head">
+          <b>播放列表</b>
+          <button id="audio-shuffle" onclick="audioToggleShuffle()">🔀 顺序播放</button>
+        </div>
+        <ul class="alist" id="audio-list"></ul>
       </div>
     </div>
   </div>
@@ -1237,6 +1336,172 @@ document.addEventListener('keydown', function (e) {
     }, 225);
   }, { passive: true });
 })();
+
+/* ---------- 音频背题 ---------- */
+var AUDIO = { catLists: {}, pli: -1, pl: [], repeat: false, shuffle: false, cur: [] };
+var AUDIO_IDX = null;            /* audio/index.json 的缓存 */
+var AUDIO_TITLE = '';
+
+/* 取一段文本供题目/UI 显示 */
+function qShort(q) {
+  return (q && q.question) ? q.question.replace(/[()【】]/g, '') : '';
+}
+
+/* 从 audio/index.json 读取可用分类 */
+function loadAudioIndex(cb) {
+  if (AUDIO_IDX) { cb(AUDIO_IDX); return; }
+  fetch('audio/index.json').then(function (r) { return r.json(); })
+    .then(function (j) { AUDIO_IDX = j; cb(j); })
+    .catch(function () { cb(null); });
+}
+
+/* 首页：展示音频背题分类列表 */
+function showAudioHome() {
+  document.getElementById('audio-cats').style.display = '';
+  document.getElementById('audio-player').style.display = 'none';
+  show('view-audio');
+  document.getElementById('audio-title').textContent = '🎧 音频背题';
+  loadAudioIndex(function (idx) {
+    var container = document.getElementById('audio-cats');
+    if (!idx) {
+      container.innerHTML = '<div class="audio-empty">未找到音频资源。请先在项目根目录运行<br><code>python audio/generate_audio.py --sub 高等教育学 --type 判断</code><br>批量生成音频后刷新页面。</div>';
+      return;
+    }
+    var keys = Object.keys(idx).sort();
+    if (!keys.length) {
+      container.innerHTML = '<div class="audio-empty">还没有可播放的分类，请先运行生成脚本。</div>';
+      return;
+    }
+    var html = keys.map(function (key) {
+      var c = idx[key];
+      var n = c.total || c.count || 0;
+      return '<div class="audio-cat" data-key="' + key + '" onclick="audioOpen(\'' + key + '\')">' +
+        '<div class="ic" data-sub="' + (c.subject || '') + '">🎧</div>' +
+        '<div class="meta"><b>' + (c.subject || key) + ' · ' + (c.type || '') + '</b>' +
+        '<span>' + n + ' 题 · ' + (c.voice ? '晓晓语音' : '语音') + '</span></div>' +
+        '<span class="play">▶ 播放</span></div>';
+    }).join('');
+    container.innerHTML = html;
+  });
+}
+
+/* 打开某分类的播放器 */
+function audioOpen(key) {
+  loadAudioIndex(function (idx) {
+    var c = (idx && idx[key]) || null;
+    if (!c || !c.files || !c.files.length) { alert('该分类暂无音频'); return; }
+    AUDIO_TITLE = (c.subject || '') + ' · ' + (c.type || '');
+    document.getElementById('audio-title').textContent = '🎧 ' + AUDIO_TITLE;
+    /* 组装播放队列：按 id 排序，带题目文本 */
+    var byId = {}; QUESTIONS.forEach(function (q) { byId[q.id] = q; });
+    AUDIO.cur = c.files.slice().sort(function (a, b) { return a.id - b.id; })
+      .map(function (f) { return { id: f.id, file: f.file, q: byId[f.id] || null }; })
+      .filter(function (x) { return x.q; });
+    AUDIO.pl = AUDIO.cur.slice();
+    AUDIO.pli = 0; AUDIO.repeat = false; AUDIO.shuffle = false;
+    renderAudioList();
+    document.getElementById('audio-cats').style.display = 'none';
+    document.getElementById('audio-player').style.display = 'block';
+    audioLoad(0);
+  });
+}
+function exitAudio() {
+  pauseAudio();
+  document.getElementById('audio-cats').style.display = '';
+  document.getElementById('audio-player').style.display = 'none';
+  goHome();
+}
+
+/* 列表渲染（当前播放列表） */
+function renderAudioList() {
+  var ul = document.getElementById('audio-list');
+  ul.innerHTML = AUDIO.pl.map(function (x, i) {
+    var t = qShort(x.q);
+    return '<li class="' + (i === AUDIO.pli ? 'on' : '') + '" onclick="audioJump(' + i + ')">' +
+      '<span class="n">' + (i + 1) + '</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + t + '</span></li>';
+  }).join('');
+}
+
+/* 加载并播放列表第 i 题 */
+function audioLoad(i) {
+  if (!AUDIO.pl.length) return;
+  if (i < 0) i = AUDIO.pl.length - 1;
+  if (i >= AUDIO.pl.length) i = 0;
+  AUDIO.pli = i;
+  var x = AUDIO.pl[i];
+  var au = new Audio(x.file);
+  au.preload = 'auto';
+  au.playbackRate = parseFloat(document.getElementById('audio-rate').value || '1');
+  au.addEventListener('loadedmetadata', function () { document.getElementById('audio-dur').textContent = fmt(au.duration); });
+  au.addEventListener('timeupdate', function () {
+    document.getElementById('audio-cur').textContent = fmt(au.currentTime);
+    var pct = au.duration ? (au.currentTime / au.duration * 100) : 0;
+    document.getElementById('audio-progress').querySelector('i').style.width = pct + '%';
+  });
+  au.addEventListener('ended', function () { audioNext(); });
+  au.addEventListener('error', function () {
+    document.getElementById('audio-detail').textContent = '（音频加载失败：' + x.file + '）';
+  });
+  AUDIO.aud = au;
+  renderAudioList();
+  syncAudioText();
+  if (AUDIO.pli > 0) { /* 预加载下一题 */ }
+  au.play().then(updateToggle).catch(function () { updateToggle(); });
+}
+function syncAudioText() {
+  var x = AUDIO.pl[AUDIO.pli];
+  var q = x.q;
+  document.getElementById('audio-qtext').textContent = q ? qShort(q) : '';
+  var detail = '';
+  if (q) {
+    detail = '<div style="margin-bottom:6px">' + (q.type || '') + '</div>' + q.question;
+    var opts = q.options;
+    if (opts) { Object.keys(opts).forEach(function (k) { detail += '<div style="margin:4px 0 0 18px">' + k + '. ' + opts[k] + '</div>'; }); }
+    detail += '<div style="margin-top:10px;padding-top:8px;border-top:1px dashed var(--line);color:var(--ok);font-weight:600">正确答案：' + q.answer + '</div>';
+    if (q.explanation) detail += '<div style="margin-top:6px;color:var(--ink-2)">' + q.explanation + '</div>';
+    if (q.knowledge) detail += '<div style="margin-top:6px;color:var(--psy)">知识点：' + q.knowledge + '</div>';
+  }
+  document.getElementById('audio-detail').innerHTML = detail;
+}
+function playlistNext(n) {
+  var len = AUDIO.pl.length;
+  if (AUDIO.shuffle) {
+    var j;
+    do { j = Math.floor(Math.random() * len); } while (len > 1 && j === AUDIO.pli);
+    return j;
+  }
+  var ni = AUDIO.pli + n;
+  if (ni >= len) return AUDIO.repeat ? 0 : -1;
+  if (ni < 0) return len - 1;
+  return ni;
+}
+function audioNext() { var n = playlistNext(1); if (n < 0) { pauseAudio(); renderAudioList(); return; } audioLoad(n); }
+function audioSkip(d) { var n = AUDIO.pli + d; if (n < 0) n = AUDIO.pl.length - 1; if (n >= AUDIO.pl.length) n = 0; audioLoad(n); }
+function audioJump(i) { audioLoad(i); }
+function audioToggle() {
+  if (!AUDIO.aud) return;
+  if (AUDIO.aud.paused) AUDIO.aud.play().then(updateToggle); else { AUDIO.aud.pause(); updateToggle(); }
+}
+function updateToggle() {
+  var b = document.getElementById('audio-toggle');
+  b.textContent = (AUDIO.aud && !AUDIO.aud.paused) ? '⏸' : '▶';
+}
+function pauseAudio() { if (AUDIO.aud) { AUDIO.aud.pause(); updateToggle(); } }
+function audioSetRate(v) { if (AUDIO.aud) AUDIO.aud.playbackRate = parseFloat(v); }
+function audioToggleRepeat() {
+  AUDIO.repeat = !AUDIO.repeat;
+  var b = document.getElementById('audio-repeat');
+  b.textContent = AUDIO.repeat ? '🔁 连播·循环' : '🔁 连播';
+  b.style.borderColor = AUDIO.repeat ? 'var(--primary)' : '';
+  b.style.color = AUDIO.repeat ? 'var(--primary)' : '';
+}
+function audioToggleShuffle() {
+  AUDIO.shuffle = !AUDIO.shuffle;
+  var b = document.getElementById('audio-shuffle');
+  b.textContent = AUDIO.shuffle ? '🔀 随机播放' : '🔀 顺序播放';
+  b.style.borderColor = AUDIO.shuffle ? 'var(--primary)' : '';
+}
+function fmt(s) { if (isNaN(s)) return '0:00'; var m = Math.floor(s / 60); var ss = Math.floor(s % 60); return m + ':' + (ss < 10 ? '0' : '') + ss; }
 
 /* ---------- Lightbox ---------- */
 function openLightbox(src) {

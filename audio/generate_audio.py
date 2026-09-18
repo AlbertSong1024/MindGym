@@ -42,12 +42,11 @@ def load_questions():
     return json.loads(m.group(1))
 
 
-def build_text(q):
-    """把一道题拼成适合朗读的一段话。"""
-    subject, type_, question = q["subject"], q["type"], q["question"]
-    answer = q["answer"]
-
-    parts = [f"{subject}，{type_}题。", f"题目：{question}"]
+def build_text(q, idx):
+    """把一道题拼成适合朗读的一段话：第N题 + 题干 + 选项 + 答案。
+    进入分类时用户已知道科目/题型，故不再朗读前缀，只报分类内题号。"""
+    question = q["question"]
+    parts = [f"第{idx}题。", f"{question}。"]
     # 选项
     opts = q.get("options") or {}
     if opts:
@@ -56,8 +55,8 @@ def build_text(q):
             if k in opts:
                 parts.append(f"{k}，{opts[k]}。")
     # 只读答案，不读解析和知识点（更简短，适合走路/跑步听）
-    parts.append(f"正确答案：{answer}。")
-    return "，".join(parts)
+    parts.append(f"正确答案：{q['answer']}。")
+    return "".join(parts)
 
 
 async def synth(voice, text, out_path):
@@ -108,7 +107,7 @@ async def main():
         mp3 = sub_dir / f"{q['id']}.mp3"
         if not (mp3.exists() and not args.force):
             try:
-                await synth(voice, build_text(q), mp3)
+                await synth(voice, build_text(q, i), mp3)
                 ok += 1
                 print(f"  [{i}/{len(picked)}] id={q['id']} ✓")
             except Exception as e:
@@ -117,7 +116,7 @@ async def main():
                 continue
         else:
             ok += 1
-        entry = {"id": q["id"], "file": f"audio/{args.sub}/{args.type}/{q['id']}.mp3"}
+        entry = {"id": q["id"], "idx": i, "file": f"audio/{args.sub}/{args.type}/{q['id']}.mp3"}
         current["files"].append(entry)
 
     current["count"] = len(current["files"])

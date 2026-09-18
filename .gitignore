@@ -6,6 +6,10 @@ _check.js
 _bracket_check.py
 test_shots/
 
+# 题库备份与原始网页（不上传托管）
+*.bak
+*.mhtml
+
 # 系统垃圾
 .DS_Store
 Thumbs.db

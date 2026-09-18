@@ -55,15 +55,8 @@ def build_text(q):
         for k in ("A", "B", "C", "D", "对", "错"):
             if k in opts:
                 parts.append(f"{k}，{opts[k]}。")
-    # 答案 + 解析
+    # 只读答案，不读解析和知识点（更简短，适合走路/跑步听）
     parts.append(f"正确答案：{answer}。")
-    expl = (q.get("explanation") or "").strip()
-    if expl:
-        parts.append(f"解析：{expl}")
-    # 知识点
-    know = (q.get("knowledge") or "").strip()
-    if know:
-        parts.append(f"知识点：{know}")
     return "，".join(parts)
 
 

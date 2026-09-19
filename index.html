@@ -508,7 +508,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 
     <!-- ==================== Footer ==================== -->
     <div class="footer">
-      <div class="ft-head">MindGym <span class="ft-ver">v2.3.2</span></div>
+      <div class="ft-head">MindGym <span class="ft-ver">v2.3.3</span></div>
       <div class="ft-row"><span class="ft-label">版权</span><span>© 2026 柠檬茶有力气 · All rights reserved.</span></div>
       <div class="ft-row"><span class="ft-label">联系</span><a href="mailto:albert.song@foxmail.com">albert.song@foxmail.com</a></div>
       <div class="ft-row">
@@ -709,6 +709,10 @@ function shuffle(arr) {
 
 /* ---------- 视图切换 ---------- */
 function show(id) {
+  /* 离开音频页时暂停播放并保存进度，避免其它页面仍在播音/多页并发 */
+  if (id !== 'view-audio' && document.getElementById('view-audio').classList.contains('active')) {
+    pauseAudio();
+  }
   document.querySelectorAll('.view').forEach(function (v) { v.classList.remove('active'); });
   document.getElementById(id).classList.add('active');
   window.scrollTo(0, 0);
@@ -1338,9 +1342,26 @@ document.addEventListener('keydown', function (e) {
 })();
 
 /* ---------- 音频背题 ---------- */
-var AUDIO = { catLists: {}, pli: -1, pl: [], repeat: false, shuffle: false, cur: [] };
+var AUDIO = { catLists: {}, pli: -1, pl: [], repeat: false, shuffle: false, cur: [], posKey: '', aud: null };
 var AUDIO_IDX = null;            /* audio/index.json 的缓存 */
 var AUDIO_TITLE = '';
+var AUDIO_POS_KEY = 'mg_audio_pos';  /* 音频进度记忆：{ 分类key: {pli, sec} } */
+
+/* 读取某分类上次听到的进度（题号 pli + 秒数 sec），无则返回 null */
+function getAudioPos(key) {
+  try { var o = JSON.parse(localStorage.getItem(AUDIO_POS_KEY) || '{}'); return o[key] || null; }
+  catch (e) { return null; }
+}
+/* 保存当前播放位置到进度存储 */
+function saveAudioPos() {
+  if (!AUDIO.posKey) return;
+  var sec = (AUDIO.aud && !isNaN(AUDIO.aud.currentTime)) ? AUDIO.aud.currentTime : 0;
+  try {
+    var o = JSON.parse(localStorage.getItem(AUDIO_POS_KEY) || '{}');
+    o[AUDIO.posKey] = { pli: AUDIO.pli, sec: sec };
+    localStorage.setItem(AUDIO_POS_KEY, JSON.stringify(o));
+  } catch (e) {}
+}
 
 /* 取一段文本供题目/UI 显示 */
 function qShort(q) {
@@ -1398,11 +1419,19 @@ function audioOpen(key) {
       .map(function (f) { return { id: f.id, file: f.file, q: byId[f.id] || null }; })
       .filter(function (x) { return x.q; });
     AUDIO.pl = AUDIO.cur.slice();
-    AUDIO.pli = 0; AUDIO.repeat = false; AUDIO.shuffle = false;
+    AUDIO.posKey = key; AUDIO.repeat = false; AUDIO.shuffle = false;
+    /* 进度记忆：从上次听到的题号/秒数继续 */
+    var pos = getAudioPos(key);
+    var startI = 0, startSec = 0;
+    if (pos && pos.pli >= 0 && pos.pli < AUDIO.pl.length) {
+      startI = pos.pli;
+      if (pos.sec && !isNaN(pos.sec)) startSec = pos.sec;
+    }
+    AUDIO.pli = startI;
     renderAudioList();
     document.getElementById('audio-cats').style.display = 'none';
     document.getElementById('audio-player').style.display = 'block';
-    audioLoad(0);
+    audioLoad(startI, startSec);
   });
 }
 function exitAudio() {
@@ -1422,8 +1451,8 @@ function renderAudioList() {
   }).join('');
 }
 
-/* 加载并播放列表第 i 题 */
-function audioLoad(i) {
+/* 加载并播放列表第 i 题；resumeSec>0 时从该秒继续（进度续播用） */
+function audioLoad(i, resumeSec) {
   if (!AUDIO.pl.length) return;
   if (i < 0) i = AUDIO.pl.length - 1;
   if (i >= AUDIO.pl.length) i = 0;
@@ -1432,7 +1461,13 @@ function audioLoad(i) {
   var au = new Audio(x.file);
   au.preload = 'auto';
   au.playbackRate = parseFloat(document.getElementById('audio-rate').value || '1');
-  au.addEventListener('loadedmetadata', function () { document.getElementById('audio-dur').textContent = fmt(au.duration); });
+  au.addEventListener('loadedmetadata', function () {
+    document.getElementById('audio-dur').textContent = fmt(au.duration);
+    /* 续播：跳到上次秒数（末尾附近则从头，避免瞬间结束） */
+    if (resumeSec && resumeSec > 0 && resumeSec < au.duration - 0.3) {
+      au.currentTime = resumeSec;
+    }
+  });
   au.addEventListener('timeupdate', function () {
     document.getElementById('audio-cur').textContent = fmt(au.currentTime);
     var pct = au.duration ? (au.currentTime / au.duration * 100) : 0;
@@ -1445,7 +1480,7 @@ function audioLoad(i) {
   AUDIO.aud = au;
   renderAudioList();
   syncAudioText();
-  if (AUDIO.pli > 0) { /* 预加载下一题 */ }
+  saveAudioPos();  /* 记录听到第几题 */
   au.play().then(updateToggle).catch(function () { updateToggle(); });
 }
 function syncAudioText() {
@@ -1486,7 +1521,7 @@ function updateToggle() {
   var b = document.getElementById('audio-toggle');
   b.textContent = (AUDIO.aud && !AUDIO.aud.paused) ? '⏸' : '▶';
 }
-function pauseAudio() { if (AUDIO.aud) { AUDIO.aud.pause(); updateToggle(); } }
+function pauseAudio() { if (AUDIO.aud) { AUDIO.aud.pause(); updateToggle(); saveAudioPos(); } }
 function audioSetRate(v) { if (AUDIO.aud) AUDIO.aud.playbackRate = parseFloat(v); }
 function audioToggleRepeat() {
   AUDIO.repeat = !AUDIO.repeat;

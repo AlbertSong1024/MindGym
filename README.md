@@ -1,7 +1,7 @@
-# MindGym v2.3.2 · 两学题库刷题应用
+# MindGym v2.3.3 · 两学题库刷题应用
 
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
-[![Version](https://img.shields.io/badge/version-v2.3.2-blue.svg)](https://github.com/AlbertSong1024/MindGym)
+[![Version](https://img.shields.io/badge/version-v2.3.3-blue.svg)](https://github.com/AlbertSong1024/MindGym)
 [![Stars](https://img.shields.io/badge/stars-⭐-yellow.svg)](https://github.com/AlbertSong1024/MindGym)
 
 纯前端、零依赖的刷题 + 背题应用，题库直接来自超星考试详情页提取。覆盖 **高等教育学** 与 **高等教育心理学** 两科共 **972 道题**（单选 / 多选 / 判断三种题型，100% 含答案解析和知识点标签），适配 PC 端和移动端，双击即可使用，无需服务器、无需联网。
@@ -241,6 +241,12 @@ A：直接点击二维码放大后右键「图片另存为」即可。
 
 ## 📅 更新日志
 
+### v2.3.3 · 2026-09-19
+
+- ⏸️ **音频进度记忆**：按分类记住「听到第几题 + 精确秒数」，下次进入该分类自动从上次位置续播（播放列表同步高亮定位）
+- 🚪 **退出即暂停**：离开音频页自动暂停并保存进度，杜绝切到其它页时多个页面仍在播音
+- 📱 **息屏持续收听**：采用原生 `<audio>` 播放真 mp3，手机锁屏 / 电脑息屏后台仍连续播放当前及下一题（自动连播），不受浏览器页面可见性影响
+
 ### v2.3.2 · 2026-09-18
 
 - 🎙️ **语音播报更简洁**：朗读开头去掉了「高等教育学，单选题」这类科目题型前缀，改为「第 N 题」（N 为分类内序号，从 1 起），连播时定位更清晰、不啰嗦
@@ -312,7 +318,7 @@ A：直接点击二维码放大后右键「图片另存为」即可。
 
 ## 👤 开发信息
 
-- **版本**：MindGym v2.3.2
+- **版本**：MindGym v2.3.3
 - **GitHub**：[https://github.com/AlbertSong1024/MindGym](https://github.com/AlbertSong1024/MindGym)
 - **Netlify 体验**：[https://liangxue-pass.netlify.app/](https://liangxue-pass.netlify.app/)
 - **GitHub Pages**：[https://albertsong1024.github.io/MindGym/](https://albertsong1024.github.io/MindGym/)

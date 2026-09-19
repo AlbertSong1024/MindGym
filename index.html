@@ -508,7 +508,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 
     <!-- ==================== Footer ==================== -->
     <div class="footer">
-      <div class="ft-head">MindGym <span class="ft-ver">v2.3.4</span></div>
+      <div class="ft-head">MindGym <span class="ft-ver">v2.3.5</span></div>
       <div class="ft-row"><span class="ft-label">版权</span><span>© 2026 柠檬茶有力气 · All rights reserved.</span></div>
       <div class="ft-row"><span class="ft-label">联系</span><a href="mailto:albert.song@foxmail.com">albert.song@foxmail.com</a></div>
       <div class="ft-row">
@@ -1378,6 +1378,7 @@ function loadAudioIndex(cb) {
 
 /* 首页：展示音频背题分类列表 */
 function showAudioHome() {
+  pauseAudio();  /* 返回分类：停止播放并记录当前进度 */
   document.getElementById('audio-cats').style.display = '';
   document.getElementById('audio-player').style.display = 'none';
   show('view-audio');
@@ -1466,6 +1467,8 @@ function audioLoad(i, resumeSec) {
   if (i >= AUDIO.pl.length) i = 0;
   AUDIO.pli = i;
   var x = AUDIO.pl[i];
+  /* 停止上一段音频，避免切题时新旧并存/重叠 */
+  if (AUDIO.aud) { try { AUDIO.aud.pause(); } catch (e) {} }
   var au = new Audio(x.file);
   au.preload = 'auto';
   au.playbackRate = parseFloat(document.getElementById('audio-rate').value || '1');

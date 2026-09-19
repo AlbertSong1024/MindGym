@@ -1,7 +1,7 @@
-# MindGym v2.3.4 · 两学题库刷题应用
+# MindGym v2.3.5 · 两学题库刷题应用
 
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
-[![Version](https://img.shields.io/badge/version-v2.3.4-blue.svg)](https://github.com/AlbertSong1024/MindGym)
+[![Version](https://img.shields.io/badge/version-v2.3.5-blue.svg)](https://github.com/AlbertSong1024/MindGym)
 [![Stars](https://img.shields.io/badge/stars-⭐-yellow.svg)](https://github.com/AlbertSong1024/MindGym)
 
 纯前端、零依赖的刷题 + 背题应用，题库直接来自超星考试详情页提取。覆盖 **高等教育学** 与 **高等教育心理学** 两科共 **972 道题**（单选 / 多选 / 判断三种题型，100% 含答案解析和知识点标签），适配 PC 端和移动端，双击即可使用，无需服务器、无需联网。
@@ -241,6 +241,11 @@ A：直接点击二维码放大后右键「图片另存为」即可。
 
 ## 📅 更新日志
 
+### v2.3.5 · 2026-09-19
+
+- 🎵 **切题即停旧音频**：点击上一题 / 下一题时立即停止当前音频，再自动切到上一 / 下一个音频播放，不再出现新旧音频重叠
+- ⏹️ **返回分类 / 退出均记录并停止**：「返回分类」也改为先停止播放、再记录当前题目与秒数（此前仅「退出」会记录），确保下次进入续听位置准确
+
 ### v2.3.4 · 2026-09-19
 
 - 🏷️ **分类进度提示**：音频背题的每个分类卡片显示「已听至第 N 题」，一眼看到各分类听到哪了（未听过的分类不显示）；进度随收听实时更新
@@ -322,7 +327,7 @@ A：直接点击二维码放大后右键「图片另存为」即可。
 
 ## 👤 开发信息
 
-- **版本**：MindGym v2.3.4
+- **版本**：MindGym v2.3.5
 - **GitHub**：[https://github.com/AlbertSong1024/MindGym](https://github.com/AlbertSong1024/MindGym)
 - **Netlify 体验**：[https://liangxue-pass.netlify.app/](https://liangxue-pass.netlify.app/)
 - **GitHub Pages**：[https://albertsong1024.github.io/MindGym/](https://albertsong1024.github.io/MindGym/)

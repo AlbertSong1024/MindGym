@@ -508,7 +508,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 
     <!-- ==================== Footer ==================== -->
     <div class="footer">
-      <div class="ft-head">MindGym <span class="ft-ver">v2.3.3</span></div>
+      <div class="ft-head">MindGym <span class="ft-ver">v2.3.4</span></div>
       <div class="ft-row"><span class="ft-label">版权</span><span>© 2026 柠檬茶有力气 · All rights reserved.</span></div>
       <div class="ft-row"><span class="ft-label">联系</span><a href="mailto:albert.song@foxmail.com">albert.song@foxmail.com</a></div>
       <div class="ft-row">
@@ -1396,10 +1396,18 @@ function showAudioHome() {
     var html = keys.map(function (key) {
       var c = idx[key];
       var n = c.total || c.count || 0;
+      /* 显示该分类上次听到的进度 */
+      var pos = getAudioPos(key);
+      var prog = '';
+      if (pos && pos.pli != null) {
+        var p = pos.pli + 1;
+        if (p > n) p = n;
+        prog = ' · <b style="color:var(--primary)">已听至第 ' + p + ' 题</b>';
+      }
       return '<div class="audio-cat" data-key="' + key + '" onclick="audioOpen(\'' + key + '\')">' +
         '<div class="ic" data-sub="' + (c.subject || '') + '">🎧</div>' +
         '<div class="meta"><b>' + (c.subject || key) + ' · ' + (c.type || '') + '</b>' +
-        '<span>' + n + ' 题 · ' + (c.voice ? '晓晓语音' : '语音') + '</span></div>' +
+        '<span>' + n + ' 题 · ' + (c.voice ? '晓晓语音' : '语音') + prog + '</span></div>' +
         '<span class="play">▶ 播放</span></div>';
     }).join('');
     container.innerHTML = html;

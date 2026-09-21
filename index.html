@@ -735,6 +735,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
   <div class="container">
     <div class="exam-progress">
       <span id="exam-pos">第 <b>1</b> / 90 题</span>
+      <button class="auto-next" id="exam-auto" title="开启后，单选/判断题选完自动切到下一题；多选题需手动点击下一题" onclick="examToggleAuto()">自动下一题</button>
       <span id="exam-answered">已答 0</span>
     </div>
     <div class="qcard">
@@ -1720,6 +1721,7 @@ var EXAM_SUBJECTS = ['高等教育学', '高等教育心理学'];
 var examDraft = null;       // 当前进行中的考试（内存态）
 var examElapsed = 0;        // 本场已用秒数（可暂停）
 var examTimer = null;       // 每秒计时器
+var examAuto = store.get('mg_exam_auto', false);  // 模拟考：答对/选中后自动切下一题
 var currentExamResult = null;   // 当前查看的历史结果（交卷后或回看）
 var examResultFilter = 'all';   // 结果列表过滤 all/wrong
 
@@ -1809,11 +1811,29 @@ function startExam(subject, draft) {
 function exitExam() { examPause(); showExamHome(); }
 
 /* ---------- 作答页渲染 ---------- */
+function paintExamAuto() {
+  var b = document.getElementById('exam-auto');
+  if (!b) return;
+  b.classList.toggle('on', examAuto);
+  b.textContent = examAuto ? '✓ 自动下一题' : '自动下一题';
+}
+function examToggleAuto() {
+  examAuto = !examAuto;
+  store.set('mg_exam_auto', examAuto);
+  paintExamAuto();
+}
+function maybeAutoNext() {
+  if (!examAuto || !examDraft) return;
+  var q = byId[curExamItem().id];
+  if (q && q.type === '多选') return;   // 多选无法判断是否选完，需手动点下一题
+  setTimeout(function () { if (examDraft) examNav(1); }, 350);
+}
 function renderExamQuiz() {
   var it = curExamItem(), q = byId[it.id];
   document.getElementById('exam-pos').innerHTML = '第 <b>' + (examDraft.idx + 1) + '</b> / ' + examDraft.questions.length + ' 题';
   var answered = examDraft.questions.filter(function (x) { return x.sel.length > 0; }).length;
   document.getElementById('exam-answered').textContent = '已答 ' + answered;
+  paintExamAuto();
 
   var typeEl = document.getElementById('exam-q-type');
   typeEl.className = 'qtype-tag'; typeEl.textContent = q.type + '题';
@@ -1880,6 +1900,7 @@ function examPick(L) {
     if (i >= 0) it.sel.splice(i, 1); else it.sel.push(L);
   } else {
     if (it.sel.length && it.sel[0] === L) it.sel = []; else it.sel = [L];
+    maybeAutoNext();
   }
   it.answered = it.sel.length > 0;
   saveExamDraft();
@@ -1891,6 +1912,7 @@ function examJudge(val) {
   it.answered = it.sel.length > 0;
   saveExamDraft();
   renderExamQuiz();
+  maybeAutoNext();
 }
 
 /* ---------- 交卷 & 判分 ---------- */

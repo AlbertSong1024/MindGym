@@ -7,10 +7,13 @@ _bracket_check.py
 test_shots/
 
 # 题库备份与原始网页（不上传托管）
-*.bak
+*.bak*
 *.mhtml
 __pycache__/
 *.pyc
+
+# 生成的题库文档（可再生，不上传托管）
+两学题库_含答案.docx
 
 # 系统垃圾
 .DS_Store

@@ -270,6 +270,8 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
   font-size:1rem;font-weight:600;min-height:56px;transition:all .18s var(--ease);
 }
 .judge-btn:hover:not(:disabled){border-color:var(--primary);background:var(--primary-soft);color:var(--primary)}
+.judge-btn.selected{border-color:var(--primary);background:var(--primary);color:#fff}
+.judge-btn.selected:hover{border-color:var(--primary);background:var(--primary);color:#fff}
 .judge-btn.correct{border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
 .judge-btn.wrong{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
 
@@ -444,6 +446,70 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
   display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s var(--ease);
 }
 .lightbox .lb-close:hover{background:rgba(255,255,255,.28)}
+
+/* ==================== 模拟考 ==================== */
+.exam-hero{background:linear-gradient(135deg,var(--primary) 0%,var(--psy) 100%);border-radius:var(--r-xl);padding:var(--xl);color:#fff;margin:var(--lg) 0;box-shadow:var(--sh-md)}
+.exam-hero-title{font-size:1.25rem;font-weight:700;letter-spacing:.3px}
+.exam-hero-sub{font-size:.8rem;margin-top:var(--sm);opacity:.95;line-height:1.6}
+.exam-hero-sub b{color:#ffe4a6}
+#exam-cards{display:flex;flex-direction:column;gap:var(--md)}
+.exam-card{background:var(--surface);border-radius:var(--r-lg);padding:var(--lg);box-shadow:var(--sh-sm);border:1px solid var(--line);display:flex;flex-direction:column;gap:var(--sm);position:relative;overflow:hidden}
+.exam-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--primary)}
+.exam-card[data-subject="高等教育学"]::before{background:var(--edu)}
+.exam-card[data-subject="高等教育心理学"]::before{background:var(--psy)}
+.exam-card .ec-head{display:flex;align-items:center;gap:var(--sm);flex-wrap:wrap}
+.exam-card h3{font-size:1rem;font-weight:700;color:var(--ink)}
+.exam-card .ec-sub{font-size:.78rem;color:var(--ink-3)}
+.exam-card .ec-score{font-size:.78rem}
+.exam-card .ec-score b{color:var(--primary)}
+.exam-card .ec-struc{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sm);margin:var(--sm) 0}
+.ec-struc div{background:var(--bg);border-radius:var(--r-md);padding:var(--sm) var(--md);text-align:center;font-size:.78rem;color:var(--ink-2)}
+.ec-struc b{display:block;font-size:.9rem;color:var(--ink)}
+.exam-card .ec-actions{display:flex;gap:var(--sm)}
+.exam-card .ec-actions .btn{flex:1;min-height:46px}
+.exam-card .draft-flag{background:var(--warn-soft);color:var(--warn);font-size:.78rem;padding:var(--xs) var(--md);border-radius:999px;font-weight:600}
+#exam-history{display:flex;flex-direction:column;gap:var(--sm)}
+.his-item{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:var(--md) var(--lg);display:flex;align-items:center;gap:var(--md);box-shadow:var(--sh-sm);flex-wrap:wrap;cursor:pointer;transition:transform .2s var(--ease)}
+.his-item:hover{transform:translateY(-2px)}
+.his-item .his-sub{font-weight:600;font-size:.95rem;color:var(--ink);flex:1;min-width:120px}
+.his-item .his-score{font-size:1.05rem;font-weight:700;font-variant-numeric:tabular-nums}
+.his-item .his-score.pass{color:var(--ok)} .his-item .his-score.fail{color:var(--bad)}
+.his-item .his-meta{font-size:.72rem;color:var(--ink-3);text-align:right;display:flex;flex-direction:column;gap:2px}
+.his-item .badge{padding:2px 10px;font-size:.68rem}
+.exam-empty{text-align:center;color:var(--ink-3);padding:var(--2xl) var(--md);font-size:.88rem}
+.exam-timer{background:var(--ink);color:#fff;font-weight:700;font-variant-numeric:tabular-nums;border-radius:999px;padding:4px 14px;font-size:.95rem;letter-spacing:.5px}
+.exam-timer.warn{background:var(--bad)}
+.exam-progress{display:flex;justify-content:space-between;align-items:center;font-size:.85rem;color:var(--ink-3);margin:var(--lg) 0 var(--md)}
+.exam-actions{display:flex;gap:var(--sm);margin-top:var(--lg)}
+.exam-actions .btn{flex:1}
+.submit-exam{width:100%;margin-top:var(--lg);min-height:52px;font-size:1rem}
+.exam-result-hero{border-radius:var(--r-xl);padding:var(--2xl) var(--lg);text-align:center;color:#fff;margin:var(--lg) 0;background:linear-gradient(135deg,var(--primary),var(--psy))}
+.exam-result-hero.good{background:linear-gradient(135deg,#059669,#0d9488)}
+.exam-result-hero.bad{background:linear-gradient(135deg,#dc2626,#f43f5e)}
+.er-score{font-size:2.6rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.2}
+.er-score small{font-size:1rem;font-weight:600;opacity:.9}
+.er-tag{display:inline-block;margin-top:var(--sm);border-radius:999px;padding:4px 16px;font-size:.85rem;font-weight:600;background:rgba(255,255,255,.2);backdrop-filter:blur(4px)}
+.er-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sm);margin:var(--md) 0 var(--lg);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:var(--md)}
+.er-stats div{text-align:center}
+.er-stats b{display:block;font-size:1.1rem;font-variant-numeric:tabular-nums}
+.er-stats span{font-size:.72rem;color:var(--ink-3)}
+.exam-result-filters{display:flex;gap:var(--sm);margin-bottom:var(--lg)}
+.seg-btn{flex:1;padding:10px;border-radius:999px;font-size:.85rem;background:var(--surface);border:1px solid var(--line);color:var(--ink-2);font-weight:500;transition:all .2s}
+.seg-btn.on{background:var(--primary);color:#fff;border-color:var(--primary)}
+#exam-result-list{display:flex;flex-direction:column;gap:var(--md)}
+.res-q{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:var(--lg);border-left:4px solid var(--bad)}
+.res-q.ok{border-left-color:var(--ok)}
+.res-q .rq-head{display:flex;align-items:center;gap:var(--sm);flex-wrap:wrap;margin-bottom:var(--sm)}
+.res-q .rq-text{font-size:.95rem;font-weight:600;color:var(--ink);margin-bottom:var(--sm);line-height:1.6}
+.res-q .rq-choice{font-size:.85rem;padding:var(--xs) 0;color:var(--ink-2)}
+.res-q .rq-choice.sel{color:var(--bad)}
+.res-q.ok .rq-choice.sel{color:var(--ok)}
+.res-q .rq-ans{margin-top:var(--sm);font-size:.88rem;padding:var(--sm) var(--md);border-radius:var(--r-md);background:var(--ok-soft);color:var(--ok)}
+.res-q .rq-exp{margin-top:var(--sm);font-size:.85rem;color:var(--ink-2);background:var(--bg);padding:var(--sm) var(--md);border-radius:var(--r-md);line-height:1.7}
+@media (max-width:560px){
+  .exam-card .ec-struc{grid-template-columns:1fr}
+  .er-stats{grid-template-columns:repeat(3,1fr)}
+}
 </style>
 </head>
 <body>
@@ -499,6 +565,10 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
       <button class="quick all" onclick="startAll()">
         <div><b>🎯 全库随机 100 题</b></div>
         <span id="quick-all-n">从 999 题中随机抽取模拟练习</span>
+      </button>
+      <button class="quick exam" onclick="showExamHome()" style="grid-column:1/-1;min-height:auto;padding:var(--lg) var(--xl);flex-direction:row;justify-content:space-between;align-items:center">
+        <div><b>📝 模拟考试</b></div>
+        <span>两科各 90 题 · 每科 60 分钟 · 60 分及格</span>
       </button>
       <button class="quick audio" onclick="showAudioHome()" style="grid-column:1/-1;min-height:auto;padding:var(--lg) var(--xl);flex-direction:row;justify-content:space-between;align-items:center">
         <div><b>🎧 音频背题</b></div>
@@ -642,6 +712,78 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
   </div>
 </div>
 
+<!-- ==================== 模拟考中心 ==================== -->
+<div class="view" id="view-exam">
+  <div class="topbar"><div class="topbar-inner">
+    <button class="back" onclick="goHome()">← 返回</button>
+    <div class="title">模拟考试</div>
+  </div></div>
+  <div class="container">
+    <div class="exam-hero">
+      <div class="exam-hero-title">🎯 高校教师资格模拟考</div>
+      <div class="exam-hero-sub">每科 100 分 · 60 分钟 · 及格线 60 分 · <b>两科均 ≥60 分才算整体通过</b></div>
+    </div>
+    <div id="exam-cards"></div>
+    <div class="sec-title">考试记录</div>
+    <div id="exam-history"></div>
+  </div>
+</div>
+
+<!-- ==================== 模拟考-作答 ==================== -->
+<div class="view" id="view-exam-quiz">
+  <div class="topbar"><div class="topbar-inner">
+    <button class="back" onclick="exitExam()">← 退出</button>
+    <div class="title" id="exam-quiz-title">模拟考</div>
+    <div class="exam-timer" id="exam-timer">60:00</div>
+  </div></div>
+  <div class="container">
+    <div class="exam-progress">
+      <span id="exam-pos">第 <b>1</b> / 90 题</span>
+      <span id="exam-answered">已答 0</span>
+    </div>
+    <div class="qcard">
+      <div class="qtype-tag" id="exam-q-type"></div>
+      <div class="qtext" id="exam-q-text"></div>
+      <div class="options" id="exam-q-options"></div>
+      <div class="judge-btns" id="exam-q-judge" style="display:none">
+        <button class="judge-btn" onclick="examJudge('对')">✓ 正确</button>
+        <button class="judge-btn" onclick="examJudge('错')">✗ 错误</button>
+      </div>
+    </div>
+    <div class="exam-actions">
+      <button class="btn ghost" id="exam-prev" onclick="examNav(-1)">上一题</button>
+      <button class="btn primary" id="exam-next" onclick="examNav(1)">下一题 →</button>
+    </div>
+    <div class="sheet" style="margin-top:var(--lg)">
+      <div class="sheet-head"><span>答题卡（90 格，点击可跳题）</span><button id="exam-jump-all" onclick="examShowAll()">定位</button></div>
+      <div class="sheet-grid" id="exam-sheet"></div>
+      <div class="legend" id="exam-legend">
+        <span><i style="background:var(--ok)"></i>已作答</span>
+        <span><i style="background:#fff;border:1.5px solid var(--primary)"></i>当前题</span>
+        <span><i style="background:#f1f5f9"></i>未做</span>
+      </div>
+    </div>
+    <button class="btn danger submit-exam" onclick="examSubmit()">交卷</button>
+  </div>
+</div>
+
+<!-- ==================== 模拟考-结果 ==================== -->
+<div class="view" id="view-exam-result">
+  <div class="topbar"><div class="topbar-inner">
+    <button class="back" onclick="goExamHistory()">← 返回</button>
+    <div class="title">考试结果</div>
+  </div></div>
+  <div class="container">
+    <div class="exam-result-hero" id="exam-result-hero"></div>
+    <div class="er-stats" id="exam-result-stats"></div>
+    <div class="exam-result-filters">
+      <button class="seg-btn on" id="filter-all" onclick="examResultFilterSet('all')">全部题目</button>
+      <button class="seg-btn" id="filter-wrong" onclick="examResultFilterSet('wrong')">只看错题 🔥</button>
+    </div>
+    <div id="exam-result-list"></div>
+  </div>
+</div>
+
 <script>
 /* =========================================================
  * 两学题库刷题应用（纯前端，无依赖）
@@ -712,6 +854,10 @@ function show(id) {
   /* 离开音频页时暂停播放并保存进度，避免其它页面仍在播音/多页并发 */
   if (id !== 'view-audio' && document.getElementById('view-audio').classList.contains('active')) {
     pauseAudio();
+  }
+  /* 离开模拟考作答页 → 暂停倒计时并保存草稿（计时「暂停」而非继续消耗） */
+  if (id !== 'view-exam-quiz' && document.getElementById('view-exam-quiz').classList.contains('active')) {
+    examPause();
   }
   document.querySelectorAll('.view').forEach(function (v) { v.classList.remove('active'); });
   document.getElementById(id).classList.add('active');
@@ -1563,6 +1709,351 @@ document.addEventListener('click', function (e) {
   var img = e.target.closest('.ft-qr img');
   if (img) { openLightbox(img.getAttribute('src')); }
 });
+
+/* =========================================================
+ * 模拟考试模块
+ * 两科独立考试：教育学 / 心理学，各 90 题、100 分、60 分钟、60 分及格
+ * 题型：单选40×1 + 多选20×1.5 + 判断30×1 = 100 分
+ * 支持中途退出暂停（记录已作答与时耗），下次继续或重开；记录每次考试历史与错题，
+ * 交卷后可查看全部解析或只看错题解析。
+ * ========================================================= */
+var EXAM_TIME = 3600;                       // 每科 60 分钟（秒）
+var EXAM_PASS = 60;                          // 及格线
+var EXAM_COMBO = [                           // 题型构成（依次排列）
+  { type: '单选', count: 40, score: 1 },
+  { type: '多选', count: 20, score: 1.5 },
+  { type: '判断', count: 30, score: 1 }
+];
+var EXAM_SUBJECTS = ['高等教育学', '高等教育心理学'];
+
+var examDraft = null;       // 当前进行中的考试（内存态）
+var examElapsed = 0;        // 本场已用秒数（可暂停）
+var examTimer = null;       // 每秒计时器
+var currentExamResult = null;   // 当前查看的历史结果（交卷后或回看）
+var examResultFilter = 'all';   // 结果列表过滤 all/wrong
+
+function getExamHistory() { return store.get('mg_exam_history', []); }
+function saveExamHistory(h) { store.set('mg_exam_history', h); }
+function examDraftKey(s) { return 'mg_exam_draft_' + s; }
+function loadExamDraft(s) { return store.get(examDraftKey(s), null); }
+function saveExamDraft() {
+  if (!examDraft) return;
+  examDraft.elapsed = examElapsed;
+  examDraft.idx = examDraft.idx || 0;
+  store.set(examDraftKey(examDraft.subject), examDraft);
+}
+function curExamItem() { return examDraft.questions[examDraft.idx]; }
+function examIsOk(q, sel) {
+  sel = sel || [];
+  if (q.type === '判断') return sel[0] === q.answer;
+  var a = q.answer.split('').sort().join('');
+  var b = sel.slice().sort().join('');
+  return a === b && sel.length === q.answer.length;
+}
+
+/* ---------- 抽题 ---------- */
+function buildExamQuestions(subject) {
+  var out = [];
+  EXAM_COMBO.forEach(function (cfg) {
+    shuffle(pick(subject, cfg.type)).slice(0, cfg.count)
+      .forEach(function (q) { out.push({ id: q.id, sel: [], answered: false }); });
+  });
+  return out;
+}
+
+/* ---------- 计时 ---------- */
+function examTimerDisplay() {
+  var rem = Math.max(0, EXAM_TIME - examElapsed);
+  var mm = Math.floor(rem / 60), ss = rem % 60;
+  var t = document.getElementById('exam-timer');
+  t.textContent = (mm < 10 ? '0' : '') + mm + ':' + (ss < 10 ? '0' : '') + ss;
+  t.classList.toggle('warn', rem <= 300);
+}
+function examTimerStart() {
+  if (examTimer) clearInterval(examTimer);
+  examTimerDisplay();
+  examTimer = setInterval(function () {
+    examElapsed++;
+    examTimerDisplay();
+    if (examElapsed >= EXAM_TIME) {
+      clearInterval(examTimer); examTimer = null;
+      alert('时间到，系统将自动交卷。');
+      examSubmit(true);
+    }
+  }, 1000);
+}
+function examPause() {
+  if (examTimer) { clearInterval(examTimer); examTimer = null; }
+  if (examDraft) { examDraft.elapsed = examElapsed; saveExamDraft(); }
+}
+
+/* ---------- 进入/继续/重开 ---------- */
+function examStart(subject) {
+  var draft = loadExamDraft(subject);
+  if (draft && draft.questions && draft.questions.length) {
+    var done = draft.questions.filter(function (it) { return it.sel.length > 0; }).length;
+    if (confirm(subject + ' 有一场未完成的模拟考（已作答 ' + done + '/' + draft.questions.length + ' 题）。\n\n点击「确定」继续作答；点击「取消」则重新开始一场全新考试。')) {
+      startExam(subject, draft);
+      return;
+    }
+    if (!confirm('确定放弃当前进度，重新开始新考试吗？')) return;
+    try { localStorage.removeItem(examDraftKey(subject)); } catch (e) {}
+  }
+  startExam(subject, null);
+}
+function startExam(subject, draft) {
+  var qs = draft ? draft.questions : buildExamQuestions(subject);
+  examDraft = {
+    subject: subject, questions: qs,
+    idx: draft ? (draft.idx || 0) : 0,
+    elapsed: draft ? (draft.elapsed || 0) : 0,
+    startedAt: draft ? draft.startedAt : Date.now()
+  };
+  examElapsed = examDraft.elapsed;
+  document.getElementById('exam-quiz-title').textContent = subject + ' · 模拟考';
+  show('view-exam-quiz');
+  renderExamQuiz();
+  examTimerStart();
+}
+function exitExam() { examPause(); showExamHome(); }
+
+/* ---------- 作答页渲染 ---------- */
+function renderExamQuiz() {
+  var it = curExamItem(), q = byId[it.id];
+  document.getElementById('exam-pos').innerHTML = '第 <b>' + (examDraft.idx + 1) + '</b> / ' + examDraft.questions.length + ' 题';
+  var answered = examDraft.questions.filter(function (x) { return x.sel.length > 0; }).length;
+  document.getElementById('exam-answered').textContent = '已答 ' + answered;
+
+  var typeEl = document.getElementById('exam-q-type');
+  typeEl.className = 'qtype-tag'; typeEl.textContent = q.type + '题';
+
+  var box = document.getElementById('exam-q-options');
+  var judge = document.getElementById('exam-q-judge');
+  if (q.type === '判断') {
+    box.style.display = 'none'; judge.style.display = 'grid';
+    judge.querySelectorAll('button').forEach(function (b) {
+      var t = b.textContent.replace(/[✓✗\s]/g, '');
+      var val = (t.indexOf('对') >= 0) ? '对' : (t.indexOf('错') >= 0 ? '错' : t);
+      b.className = 'judge-btn' + (it.sel[0] === val ? ' selected' : '');
+    });
+  } else {
+    judge.style.display = 'none'; box.style.display = 'flex'; box.innerHTML = '';
+    var letters = ['A', 'B', 'C', 'D'];
+    letters.forEach(function (L) {
+      var text = q.options && q.options[L];
+      if (text == null) return;
+      var b = document.createElement('button');
+      b.className = 'opt' + (it.sel.indexOf(L) >= 0 ? ' selected' : '');
+      b.innerHTML = '<span class="letter">' + L + '</span><span>' + esc(text) + '</span>';
+      b.onclick = function () { examPick(L); };
+      box.appendChild(b);
+    });
+  }
+  document.getElementById('exam-q-text').textContent = q.question;
+
+  document.getElementById('exam-prev').disabled = examDraft.idx === 0;
+  document.getElementById('exam-next').disabled = examDraft.idx === examDraft.questions.length - 1;
+  examBuildSheet();
+  examTimerDisplay();
+}
+function examBuildSheet() {
+  var grid = document.getElementById('exam-sheet'); grid.innerHTML = '';
+  examDraft.questions.forEach(function (it, i) {
+    var b = document.createElement('button');
+    var cls = [];
+    if (i === examDraft.idx) cls.push('cur');
+    else if (it.sel.length > 0) cls.push('right');
+    b.className = cls.join(' ');
+    b.textContent = i + 1;
+    b.onclick = function () { examJump(i); };
+    grid.appendChild(b);
+  });
+}
+function examShowAll() {
+  var s = document.querySelector('#view-exam-quiz .sheet');
+  if (s) s.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function examJump(i) { examDraft.idx = i; saveExamDraft(); renderExamQuiz(); }
+function examNav(d) {
+  var n = examDraft.idx + d;
+  if (n < 0) n = 0;
+  if (n > examDraft.questions.length - 1) n = examDraft.questions.length - 1;
+  examDraft.idx = n; saveExamDraft(); renderExamQuiz();
+}
+
+/* ---------- 作答 ---------- */
+function examPick(L) {
+  var it = curExamItem(), q = byId[it.id];
+  if (q.type === '多选') {
+    var i = it.sel.indexOf(L);
+    if (i >= 0) it.sel.splice(i, 1); else it.sel.push(L);
+  } else {
+    if (it.sel.length && it.sel[0] === L) it.sel = []; else it.sel = [L];
+  }
+  it.answered = it.sel.length > 0;
+  saveExamDraft();
+  renderExamQuiz();
+}
+function examJudge(val) {
+  var it = curExamItem();
+  if (it.sel.length && it.sel[0] === val) it.sel = []; else it.sel = [val];
+  it.answered = it.sel.length > 0;
+  saveExamDraft();
+  renderExamQuiz();
+}
+
+/* ---------- 交卷 & 判分 ---------- */
+function examSubmit(auto) {
+  if (!examDraft) return;
+  if (examTimer) { clearInterval(examTimer); examTimer = null; }
+  if (!auto && !confirm('确定交卷吗？交卷后将记录成绩并进入结果页，不可再次修改。')) {
+    examTimerStart();
+    return;
+  }
+  var d = examDraft;
+  var detail = [], score = 0, single = 0, multi = 0, judge = 0, right = 0, done = 0;
+  d.questions.forEach(function (it) {
+    var q = byId[it.id]; if (!q) return;
+    it.answered = it.sel.length > 0;
+    var ok = examIsOk(q, it.sel);
+    it.ok = ok;
+    if (it.answered) done++;
+    if (ok) { right++; var p = q.type === '多选' ? 1.5 : 1; score += p;
+      if (q.type === '单选') single += 1; else if (q.type === '多选') multi += 1.5; else judge += 1;
+    }
+    detail.push({ id: q.id, type: q.type, q: q, sel: it.sel, ok: ok, answered: it.answered });
+  });
+  var passed = score >= EXAM_PASS;
+  var his = {
+    id: Date.now(), subject: d.subject,
+    score: Math.round(score * 10) / 10,
+    single: single, multi: Math.round(multi * 10) / 10, judge: judge,
+    right: right, total: d.questions.length, answered: done,
+    duration: examElapsed, date: new Date().toLocaleString('zh-CN'),
+    passed: passed, detail: detail
+  };
+  var H = getExamHistory(); H.unshift(his); if (H.length > 100) H.length = 100; saveExamHistory(H);
+  try { localStorage.removeItem(examDraftKey(d.subject)); } catch (e) {}
+  examDraft = null; examElapsed = 0;
+  currentExamResult = his; examResultFilter = 'all';
+  renderExamResult();
+  show('view-exam-result');
+}
+
+/* ---------- 结果页 ---------- */
+function renderExamResult() {
+  var r = currentExamResult; if (!r) { return; }
+  var hero = document.getElementById('exam-result-hero');
+  hero.className = 'exam-result-hero ' + (r.passed ? 'good' : 'bad');
+  hero.innerHTML = '<div class="er-score">' + r.score + '<small> 分 / 100</small></div>' +
+    '<div class="er-tag">' + (r.passed ? '🎉 及格（≥60）' : '😢 未及格（<60）') + '</div>';
+
+  var acc = r.answered ? Math.round(r.right / r.answered * 100) : 0;
+  var stats = document.getElementById('exam-result-stats');
+  stats.innerHTML =
+    '<div><b>' + acc + '%</b><span>正确率</span></div>' +
+    '<div><b>' + r.answered + '/' + r.total + '</b><span>已作答</span></div>' +
+    '<div><b>' + (r.total - r.right) + '</b><span>错题</span></div>';
+
+  document.getElementById('filter-all').classList.toggle('on', examResultFilter === 'all');
+  document.getElementById('filter-wrong').classList.toggle('on', examResultFilter === 'wrong');
+  renderExamResultList();
+}
+function examResultList() {
+  var r = currentExamResult; if (!r) return [];
+  return r.detail.filter(function (it) { return examResultFilter === 'all' || !it.ok; });
+}
+function examResultFilterSet(f) {
+  examResultFilter = f;
+  document.getElementById('filter-all').classList.toggle('on', f === 'all');
+  document.getElementById('filter-wrong').classList.toggle('on', f === 'wrong');
+  renderExamResultList();
+}
+function renderExamResultList() {
+  var list = document.getElementById('exam-result-list'); list.innerHTML = '';
+  var items = examResultList();
+  if (!items.length) {
+    list.innerHTML = '<div class="exam-empty">🎉 这份卷子没有需要展示的题目（全部题目模式下正常显示）。</div>';
+    return;
+  }
+  items.forEach(function (it) {
+    var q = it.q;
+    var okCls = it.ok ? 'ok' : '';
+    var statusText = it.ok ? '✓ 正确' : (it.answered ? '✗ 错误' : '✗ 未作答');
+    var statusColor = it.ok ? 'var(--ok)' : 'var(--bad)';
+    var choices = '';
+    if (q.options) {
+      var letters = Object.keys(q.options);
+      letters.forEach(function (L) {
+        var sel = it.sel.indexOf(L) >= 0;
+        choices += '<div class="rq-choice' + (sel ? ' sel' : '') + '">' + L + '. ' + esc(q.options[L]) + (sel ? '　← 你选' : '') + '</div>';
+      });
+    } else {
+      choices = '<div class="rq-choice">你的选择：' + (it.sel[0] ? esc(String(it.sel[0])) : '（未作答）') + '</div>';
+    }
+    var yourAnswer = it.sel.length ? (Array.isArray(it.sel) ? it.sel.join('、') : String(it.sel)) : '未作答';
+    list.innerHTML += '<div class="res-q ' + okCls + '">' +
+      '<div class="rq-head"><span class="badge t' + q.type + '">' + q.type + '</span><b style="font-size:.78rem;color:' + statusColor + '">' + statusText + '</b></div>' +
+      '<div class="rq-text">' + esc(q.question) + '</div>' +
+      choices +
+      '<div class="rq-ans">正确答案：' + esc(String(q.answer)) + '　·　你的答案：' + esc(yourAnswer) + '</div>' +
+      (q.explanation ? ('<div class="rq-exp">📖 ' + esc(q.explanation) + '</div>') : '') +
+      (q.knowledge ? ('<div class="rq-exp" style="background:var(--psy-soft);color:var(--psy)">🏷️ 考点：' + esc(q.knowledge) + '</div>') : '') +
+      '</div>';
+  });
+}
+
+/* ---------- 模拟考中心 ---------- */
+function showExamHome() { examPause(); renderExamHome(); show('view-exam'); }
+function goExamHistory() { showExamHome(); }
+function examOpenHistory(id) {
+  var r = getExamHistory().filter(function (h) { return h.id === id; })[0];
+  if (!r) return;
+  currentExamResult = r; examResultFilter = 'all';
+  renderExamResult();
+  show('view-exam-result');
+}
+function renderExamHome() {
+  var hist = getExamHistory();
+  var lastBySub = {};
+  hist.forEach(function (h) { if (!lastBySub[h.subject] || h.id > lastBySub[h.subject].id) lastBySub[h.subject] = h; });
+
+  var cards = document.getElementById('exam-cards'); cards.innerHTML = '';
+  EXAM_SUBJECTS.forEach(function (s) {
+    var draft = loadExamDraft(s);
+    var last = lastBySub[s] || null;
+    var done = draft ? draft.questions.filter(function (it) { return it.sel.length > 0; }).length : 0;
+    var btnText = draft ? ('继续作答（' + done + '/' + draft.questions.length + '）') : '开始考试';
+    cards.innerHTML +=
+      '<div class="exam-card" data-subject="' + s + '">' +
+      '<div class="ec-head"><h3>' + s + '</h3>' +
+      '<span class="ec-sub">100 分 · 60 分钟 · 及格 60 分</span>' +
+      (draft ? '<span class="draft-flag">⏸ 未完待续</span>' : '') +
+      (last ? '<span class="ec-score">上次 <b>' + last.score + '</b> 分 · ' + (last.passed ? '及格' : '未及格') + '</span>' : '<span class="ec-score">尚未考过</span>') +
+      '</div>' +
+      '<div class="ec-struc">' +
+      '<div><b>单选 40</b><span>×1 分</span></div>' +
+      '<div><b>多选 20</b><span>×1.5 分</span></div>' +
+      '<div><b>判断 30</b><span>×1 分</span></div>' +
+      '</div>' +
+      '<div class="ec-actions"><button class="btn primary" onclick="examStart(\'' + s + '\')">' + btnText + '</button></div>' +
+      '</div>';
+  });
+
+  var hl = document.getElementById('exam-history');
+  if (!hist.length) {
+    hl.innerHTML = '<div class="exam-empty">还没有模拟考记录。选择上方科目开考吧，可无限次重考，两科均 ≥60 分才算整体通过。</div>';
+    return;
+  }
+  hl.innerHTML = hist.slice(0, 30).map(function (h) {
+    return '<div class="his-item" onclick="examOpenHistory(' + h.id + ')">' +
+      '<span class="his-sub">' + h.subject + '</span>' +
+      '<span class="his-score ' + (h.passed ? 'pass' : 'fail') + '">' + h.score + ' 分</span>' +
+      '<span class="badge ' + (h.passed ? 's1' : '') + '">' + (h.passed ? '及格' : '未及格') + '</span>' +
+      '<span class="his-meta"><span>正确率 ' + (h.answered ? Math.round(h.right / h.answered * 100) : 0) + '%（对 ' + h.right + '）</span><span>' + h.date + '</span></span>' +
+      '</div>';
+  }).join('');
+}
 
 /* ---------- 启动 ---------- */
 renderHome();

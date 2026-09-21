@@ -361,6 +361,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .sheet-grid button:hover{background:#e2e8f0}
 .sheet-grid button.cur{border-color:var(--primary);color:var(--primary);background:#fff;box-shadow:0 0 0 3px rgba(79,70,229,.15)}
 .sheet-grid button.right{background:var(--ok-soft);color:var(--ok)}
+.sheet-group-label{grid-column:1/-1;font-size:.72rem;font-weight:700;color:var(--primary);letter-spacing:.5px;margin:var(--xs) 0 2px;background:var(--primary-soft);border-radius:var(--r-sm);padding:3px 8px;display:flex;align-items:center}
 .sheet-grid button.wrong{background:var(--bad-soft);color:var(--bad)}
 .legend{display:flex;gap:var(--lg);margin-top:var(--md);font-size:.72rem;color:var(--ink-3);flex-wrap:wrap}
 .legend span{display:inline-flex;align-items:center;gap:4px}
@@ -1882,13 +1883,24 @@ function renderExamQuiz() {
 }
 function examBuildSheet() {
   var grid = document.getElementById('exam-sheet'); grid.innerHTML = '';
+  var lastType = null, typeIdx = 0;
   examDraft.questions.forEach(function (it, i) {
+    var type = byId[it.id].type;
+    if (type !== lastType) {          // 题型变化 → 插入组标题，序号重置为从 1 开始
+      lastType = type; typeIdx = 0;
+      var g = document.createElement('div');
+      g.className = 'sheet-group-label';
+      g.textContent = EXAM_TYPE_TITLE[type] || type;
+      grid.appendChild(g);
+    }
+    typeIdx++;
     var b = document.createElement('button');
     var cls = [];
     if (i === examDraft.idx) cls.push('cur');
     else if (it.sel.length > 0) cls.push('right');
     b.className = cls.join(' ');
-    b.textContent = i + 1;
+    b.textContent = typeIdx;          // 组内序号，从 1 连续编号
+    b.title = (EXAM_TYPE_TITLE[type] || type) + ' 第 ' + typeIdx + ' 题';
     b.onclick = function () { examJump(i); };
     grid.appendChild(b);
   });

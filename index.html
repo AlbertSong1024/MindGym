@@ -499,6 +499,9 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 #exam-result-list{display:flex;flex-direction:column;gap:var(--md)}
 .res-q{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:var(--lg);border-left:4px solid var(--bad)}
 .res-q.ok{border-left-color:var(--ok)}
+.res-q.partial{border-left-color:var(--warn)}
+.res-group-title{font-size:.9rem;font-weight:700;color:var(--ink);margin:var(--md) 0 var(--sm);display:flex;align-items:center;gap:var(--sm)}
+.res-group-title::after{content:'';flex:1;height:1px;background:var(--line)}
 .res-q .rq-head{display:flex;align-items:center;gap:var(--sm);flex-wrap:wrap;margin-bottom:var(--sm)}
 .res-q .rq-text{font-size:.95rem;font-weight:600;color:var(--ink);margin-bottom:var(--sm);line-height:1.6}
 .res-q .rq-choice{font-size:.85rem;padding:var(--xs) 0;color:var(--ink-2)}
@@ -1736,12 +1739,22 @@ function saveExamDraft() {
   store.set(examDraftKey(examDraft.subject), examDraft);
 }
 function curExamItem() { return examDraft.questions[examDraft.idx]; }
-function examIsOk(q, sel) {
+/* 判分：单选/判断答对 1 分；多选全对 1.5 分、漏选 0.8 分、错选或未答 0 分 */
+function examGrade(q, sel) {
   sel = sel || [];
-  if (q.type === '判断') return sel[0] === q.answer;
-  var a = q.answer.split('').sort().join('');
-  var b = sel.slice().sort().join('');
-  return a === b && sel.length === q.answer.length;
+  if (q.type !== '多选') {
+    var ok = sel.length > 0 && sel[0] === q.answer;
+    return { ok: ok, partial: false, score: ok ? 1 : 0 };
+  }
+  var ans = q.answer.split('');
+  var chosen = sel.slice();
+  var allCorrect = chosen.length === ans.length &&
+    ans.every(function (a) { return chosen.indexOf(a) >= 0; });
+  if (allCorrect) return { ok: true, partial: false, score: 1.5 };
+  if (!chosen.length) return { ok: false, partial: false, score: 0 };           // 未答
+  var hasWrong = chosen.some(function (c) { return ans.indexOf(c) < 0; });
+  if (hasWrong) return { ok: false, partial: false, score: 0 };                 // 错选
+  return { ok: false, partial: true, score: 0.8 }                               // 漏选
 }
 
 /* ---------- 抽题 ---------- */
@@ -1928,13 +1941,15 @@ function examSubmit(auto) {
   d.questions.forEach(function (it) {
     var q = byId[it.id]; if (!q) return;
     it.answered = it.sel.length > 0;
-    var ok = examIsOk(q, it.sel);
-    it.ok = ok;
+    var g = examGrade(q, it.sel);
+    it.ok = g.ok; it.partial = g.partial; it.score = g.score;
     if (it.answered) done++;
-    if (ok) { right++; var p = q.type === '多选' ? 1.5 : 1; score += p;
-      if (q.type === '单选') single += 1; else if (q.type === '多选') multi += 1.5; else judge += 1;
-    }
-    detail.push({ id: q.id, type: q.type, q: q, sel: it.sel, ok: ok, answered: it.answered });
+    if (g.ok) right++;
+    score += g.score;
+    if (q.type === '单选') single += g.score;
+    else if (q.type === '多选') multi += g.score;
+    else judge += g.score;
+    detail.push({ id: q.id, type: q.type, q: q, sel: it.sel, ok: g.ok, partial: g.partial, score: g.score, answered: it.answered });
   });
   var passed = score >= EXAM_PASS;
   var his = {
@@ -1982,6 +1997,7 @@ function examResultFilterSet(f) {
   document.getElementById('filter-wrong').classList.toggle('on', f === 'wrong');
   renderExamResultList();
 }
+var EXAM_TYPE_TITLE = { 单选: '单选题', 多选: '多选题', 判断: '判断题' };
 function renderExamResultList() {
   var list = document.getElementById('exam-result-list'); list.innerHTML = '';
   var items = examResultList();
@@ -1989,11 +2005,16 @@ function renderExamResultList() {
     list.innerHTML = '<div class="exam-empty">🎉 这份卷子没有需要展示的题目（全部题目模式下正常显示）。</div>';
     return;
   }
+  var lastType = null, typeIdx = 0;
   items.forEach(function (it) {
     var q = it.q;
-    var okCls = it.ok ? 'ok' : '';
-    var statusText = it.ok ? '✓ 正确' : (it.answered ? '✗ 错误' : '✗ 未作答');
-    var statusColor = it.ok ? 'var(--ok)' : 'var(--bad)';
+    if (it.type !== lastType) { lastType = it.type; typeIdx = 0;
+      list.innerHTML += '<div class="res-group-title">' + (EXAM_TYPE_TITLE[it.type] || it.type) + '</div>';
+    }
+    typeIdx++;
+    var okCls = it.ok ? 'ok' : (it.partial ? 'partial' : '');
+    var statusText = it.ok ? '✓ 正确' : (it.partial ? '⚠ 漏选' : (it.answered ? '✗ 错误' : '✗ 未作答'));
+    var statusColor = it.ok ? 'var(--ok)' : (it.partial ? 'var(--warn)' : 'var(--bad)');
     var choices = '';
     if (q.options) {
       var letters = Object.keys(q.options);
@@ -2005,8 +2026,12 @@ function renderExamResultList() {
       choices = '<div class="rq-choice">你的选择：' + (it.sel[0] ? esc(String(it.sel[0])) : '（未作答）') + '</div>';
     }
     var yourAnswer = it.sel.length ? (Array.isArray(it.sel) ? it.sel.join('、') : String(it.sel)) : '未作答';
+    var scoreText = it.score > 0 ? ('本题得 ' + it.score + ' 分') : '本题 0 分';
     list.innerHTML += '<div class="res-q ' + okCls + '">' +
-      '<div class="rq-head"><span class="badge t' + q.type + '">' + q.type + '</span><b style="font-size:.78rem;color:' + statusColor + '">' + statusText + '</b></div>' +
+      '<div class="rq-head"><span class="badge t' + q.type + '">' + q.type + '</span>' +
+      '<b>第 ' + typeIdx + ' 题</b>' +
+      '<b style="font-size:.78rem;color:' + statusColor + '">' + statusText + '</b>' +
+      '<b style="font-size:.76rem;color:var(--ink-3);margin-left:auto">' + scoreText + '</b></div>' +
       '<div class="rq-text">' + esc(q.question) + '</div>' +
       choices +
       '<div class="rq-ans">正确答案：' + esc(String(q.answer)) + '　·　你的答案：' + esc(yourAnswer) + '</div>' +

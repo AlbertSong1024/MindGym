@@ -150,15 +150,15 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 }
 .quick.wrong{background:linear-gradient(135deg,#f87171,#dc2626)}
 .quick.fav{background:linear-gradient(135deg,#fbbf24,#d97706)}
-.quick.all{
+.quick.exam{
   background:linear-gradient(135deg,#4f46e5,#7c3aed);
   grid-column:1/-1;min-height:auto;padding:var(--lg) var(--xl);
   flex-direction:row;justify-content:space-between;align-items:center;
 }
 .quick b{font-size:1rem;font-weight:700;position:relative;z-index:1}
 .quick span{font-size:.75rem;opacity:.9;position:relative;z-index:1}
-.quick.all b{font-size:1.1rem}
-.quick.all span{max-width:60%}
+.quick.exam b{font-size:1.1rem}
+.quick.exam span{max-width:60%}
 .quick:hover{transform:translateY(-2px);filter:brightness(1.05)}
 
 /* --- 音频背题 --- */
@@ -404,8 +404,8 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
   .judge-btn{padding:var(--lg) var(--sm)}
   .sheet-grid{grid-template-columns:repeat(auto-fill,minmax(32px,1fr))}
   .kbd-tip{display:none!important}
-  .quick.all{flex-direction:column;align-items:flex-start;gap:var(--xs);text-align:left}
-  .quick.all span{max-width:none}
+  .quick.exam{flex-direction:column;align-items:flex-start;gap:var(--xs);text-align:left}
+  .quick.exam span{max-width:none}
   .quiz-actions{gap:var(--sm)}
   .btn{padding:var(--md) var(--sm);font-size:.92rem}
 }
@@ -561,10 +561,6 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
       </button>
       <button class="quick fav" onclick="showFav()">
         <b>我的收藏</b><span id="quick-fav-n">0 道收藏</span>
-      </button>
-      <button class="quick all" onclick="startAll()">
-        <div><b>🎯 全库随机 100 题</b></div>
-        <span id="quick-all-n">从 999 题中随机抽取模拟练习</span>
       </button>
       <button class="quick exam" onclick="showExamHome()" style="grid-column:1/-1;min-height:auto;padding:var(--lg) var(--xl);flex-direction:row;justify-content:space-between;align-items:center">
         <div><b>📝 模拟考试</b></div>
@@ -890,7 +886,6 @@ function renderHome() {
   stats[4].textContent = favSet.length;
   document.getElementById('quick-wrong-n').textContent = wrong + ' 道错题 · 消灭它';
   document.getElementById('quick-fav-n').textContent = favSet.length + ' 道收藏';
-  document.getElementById('quick-all-n').textContent = '从 ' + QUESTIONS.length + ' 题中随机抽取模拟练习';
 
   var grid = document.getElementById('cat-grid');
   grid.innerHTML = '';
@@ -983,10 +978,6 @@ function startFav() {
   if (!list.length) { alert('收藏夹是空的，刷题时点右上角 ☆ 收藏题目吧'); return; }
   newSession('fav', '收藏夹（' + list.length + ' 题）', list);
 }
-function startAll() {
-  newSession('all', '全库随机 100 题', shuffle(QUESTIONS).slice(0, 100));
-}
-
 /* ---------- 刷题页渲染 ---------- */
 function curQ() { return session.list[session.idx]; }
 
